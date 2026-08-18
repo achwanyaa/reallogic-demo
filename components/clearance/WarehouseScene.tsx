@@ -1,9 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Grid, Text, Html } from '@react-three/drei'
-import * as THREE from 'three'
+import { useState } from 'react'
 import { Boxes, AlertTriangle, CheckCircle2, Ruler, Trash2 } from 'lucide-react'
 
 export interface EquipmentItem {
@@ -15,171 +12,36 @@ export interface EquipmentItem {
   fits: boolean
 }
 
+export interface EquipmentOption {
+  id: string
+  name: string
+  dimensions: { length: number; width: number; height: number }
+  description?: string
+}
+
+// ─── Isometric CSS Warehouse Scene ───────────────────────────────────────────
+// Pure CSS/SVG isometric 2.5D view — no Three.js dependency needed.
+
 interface WarehouseSceneProps {
-  warehouseWidth: number  // meters
-  warehouseLength: number // meters
-  warehouseHeight: number // meters (eave height)
-  beamHeight: number      // meters (lowest beam)
+  warehouseWidth: number
+  warehouseLength: number
+  warehouseHeight: number
+  beamHeight: number
   equipment: EquipmentItem[]
   selectedId: string | null
   onSelectEquipment: (id: string | null) => void
 }
 
-function WarehouseBox({
-  width,
-  length,
-  height,
-}: {
-  width: number
-  length: number
-  height: number
-}) {
-  return (
-    <group>
-      {/* Floor Slab with structural grid */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[width, length]} />
-        <meshStandardMaterial
-          color="#0B0E13"
-          roughness={0.8}
-          metalness={0.2}
-        />
-      </mesh>
+// Scale: 1m = 8px for the floor plan, height bars use a side ruler scale
+const FLOOR_SCALE = 8 // px per meter
+const HEIGHT_SCALE = 10 // px per meter
 
-      {/* Structural bounding wireframe */}
-      <lineSegments>
-        <edgesGeometry
-          args={[new THREE.BoxGeometry(width, height, length)]}
-        />
-        <lineBasicMaterial color="#27313F" linewidth={1.5} />
-      </lineSegments>
-
-      {/* Height elevation indicators on column */}
-      {[2, 4, 6, 7.2, 8.5].map((h) => (
-        <group key={h} position={[-width / 2 - 0.5, h, 0]}>
-          <Text
-            fontSize={0.35}
-            color={h === 7.2 ? '#F59E0B' : '#606774'}
-            anchorX="right"
-            anchorY="middle"
-          >
-            {h === 7.2 ? `▲ TRUSS ${h}m` : `${h}m`}
-          </Text>
-        </group>
-      ))}
-    </group>
-  )
-}
-
-function BeamWarningPlane({
-  width,
-  length,
-  height,
-}: {
-  width: number
-  length: number
-  height: number
-}) {
-  return (
-    <group position={[0, height, 0]}>
-      {/* Translucent Clearance Warning Plane */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[width, length]} />
-        <meshStandardMaterial
-          color="#F59E0B"
-          transparent
-          opacity={0.12}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* Beam structural perimeter wireframe */}
-      <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(width, 0.1, length)]} />
-        <lineBasicMaterial color="#F59E0B" linewidth={1.5} />
-      </lineSegments>
-
-      <group position={[-width / 2 - 0.5, 0, 0]}>
-        <Text fontSize={0.3} color="#F59E0B" anchorX="right" anchorY="middle">
-          LOWEST TRUSS BEAM: {height}m
-        </Text>
-      </group>
-    </group>
-  )
-}
-
-function EquipmentMesh({
-  item,
-  isSelected,
-  onClick,
-}: {
-  item: EquipmentItem
-  isSelected: boolean
-  onClick: () => void
-}) {
-  const meshRef = useRef<THREE.Mesh>(null)
-
-  useFrame((state) => {
-    if (meshRef.current && isSelected) {
-      meshRef.current.position.y =
-        item.position[1] + Math.sin(state.clock.elapsedTime * 3) * 0.04
-    }
-  })
-
-  const { length, width, height } = item.dimensions
-
-  return (
-    <group position={item.position}>
-      <mesh
-        ref={meshRef}
-        onClick={(e) => {
-          e.stopPropagation()
-          onClick()
-        }}
-        castShadow
-      >
-        <boxGeometry args={[length, height, width]} />
-        <meshStandardMaterial
-          color={item.fits ? item.color : '#F43F5E'}
-          transparent
-          opacity={isSelected ? 0.95 : 0.75}
-          emissive={isSelected ? (item.fits ? item.color : '#F43F5E') : '#000'}
-          emissiveIntensity={isSelected ? 0.3 : 0}
-        />
-      </mesh>
-
-      {/* CAD outline */}
-      <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(length, height, width)]} />
-        <lineBasicMaterial
-          color={item.fits ? '#34D399' : '#F43F5E'}
-          linewidth={2}
-        />
-      </lineSegments>
-
-      {/* 3D Space Label */}
-      <Html position={[0, height / 2 + 0.45, 0]} center style={{ pointerEvents: 'none' }}>
-        <div
-          style={{
-            background: 'rgba(9, 11, 14, 0.95)',
-            border: `1px solid ${item.fits ? '#10B981' : '#F43F5E'}`,
-            borderRadius: '2px',
-            padding: '3px 8px',
-            fontSize: '10px',
-            fontFamily: 'var(--font-mono)',
-            color: '#FFFFFF',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.8)',
-          }}
-        >
-          <span>{item.name}</span>
-          <div style={{ color: item.fits ? '#34D399' : '#F87171', fontWeight: 700 }}>
-            {item.fits ? `✓ OK (${height}m)` : `✗ COLLISION (${height}m)`}
-          </div>
-        </div>
-      </Html>
-    </group>
-  )
+// Transform floor (x, z) to isometric screen coords
+function iso(x: number, z: number): [number, number] {
+  const TILE = FLOOR_SCALE
+  const screenX = (x - z) * TILE * 0.707
+  const screenY = (x + z) * TILE * 0.4
+  return [screenX, screenY]
 }
 
 export function WarehouseScene({
@@ -191,75 +53,249 @@ export function WarehouseScene({
   selectedId,
   onSelectEquipment,
 }: WarehouseSceneProps) {
+  // Grid line SVG paths
+  const w = warehouseWidth
+  const l = warehouseLength
+  const [cx, cy] = iso(w / 2, l / 2)
+
+  const CANVAS_W = 820
+  const CANVAS_H = 440
+  const OX = CANVAS_W / 2  // origin offset for centering
+  const OY = 60
+
+  function p(x: number, z: number) {
+    const [sx, sy] = iso(x, z)
+    return `${sx + OX},${sy + OY}`
+  }
+
+  // Warehouse floor outline (isometric quad)
+  const floorPath = `M ${p(0, 0)} L ${p(w, 0)} L ${p(w, l)} L ${p(0, l)} Z`
+
+  // Grid lines
+  const gridLines: string[] = []
+  for (let xi = 0; xi <= w; xi += 5) {
+    gridLines.push(`M ${p(xi, 0)} L ${p(xi, l)}`)
+  }
+  for (let zi = 0; zi <= l; zi += 5) {
+    gridLines.push(`M ${p(0, zi)} L ${p(w, zi)}`)
+  }
+
+  // Height column on left edge
+  const colX = -4.5
+  const colZ = 0
+
   return (
-    <Canvas
-      camera={{ position: [warehouseWidth * 0.9, warehouseHeight * 0.9, warehouseLength * 0.9], fov: 48 }}
-      shadows
-      style={{ background: '#060708', width: '100%', height: '100%' }}
-      onPointerMissed={() => onSelectEquipment(null)}
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        background: '#060708',
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: 'default',
+      }}
+      onClick={() => onSelectEquipment(null)}
     >
-      <ambientLight intensity={0.4} />
-      <directionalLight
-        position={[15, 20, 15]}
-        intensity={0.7}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-      />
-      <pointLight position={[0, warehouseHeight - 1, 0]} intensity={0.5} color="#06B6D4" />
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{ display: 'block' }}
+      >
+        {/* Floor slab */}
+        <path d={floorPath} fill="#0B0E13" stroke="#27313F" strokeWidth="1.5" />
 
-      {/* Warehouse Structural Volume */}
-      <group position={[0, 0, 0]}>
-        <WarehouseBox
-          width={warehouseWidth}
-          length={warehouseLength}
-          height={warehouseHeight}
-        />
-        <BeamWarningPlane
-          width={warehouseWidth}
-          length={warehouseLength}
-          height={beamHeight}
-        />
-      </group>
+        {/* Grid lines */}
+        {gridLines.map((d, i) => (
+          <path key={i} d={d} fill="none" stroke="#1C232D" strokeWidth={0.5} />
+        ))}
 
-      {/* Placed Equipment Objects */}
-      {equipment.map((item) => (
-        <EquipmentMesh
-          key={item.id}
-          item={item}
-          isSelected={selectedId === item.id}
-          onClick={() => onSelectEquipment(item.id)}
-        />
-      ))}
+        {/* Warehouse left wall (isometric left face) */}
+        {(() => {
+          const hPx = warehouseHeight * HEIGHT_SCALE
+          const wallPath = [
+            `M ${p(0, 0)}`,
+            `L ${p(0, 0).split(',')[0]},${parseFloat(p(0, 0).split(',')[1]) - hPx}`,
+            `L ${p(0, l).split(',')[0]},${parseFloat(p(0, l).split(',')[1]) - hPx}`,
+            `L ${p(0, l)}`,
+            'Z'
+          ].join(' ')
+          return <path d={wallPath} fill="#0E121A" stroke="#27313F" strokeWidth="1" />
+        })()}
 
-      {/* 1-Meter Floor Grid */}
-      <Grid
-        args={[60, 60]}
-        cellSize={1}
-        cellColor="#1C232D"
-        sectionSize={5}
-        sectionColor="#27313F"
-        fadeDistance={45}
-        position={[0, 0.01, 0]}
-      />
+        {/* Warehouse right wall (isometric right face) */}
+        {(() => {
+          const hPx = warehouseHeight * HEIGHT_SCALE
+          const wallPath = [
+            `M ${p(w, 0)}`,
+            `L ${p(w, 0).split(',')[0]},${parseFloat(p(w, 0).split(',')[1]) - hPx}`,
+            `L ${p(0, 0).split(',')[0]},${parseFloat(p(0, 0).split(',')[1]) - hPx}`,
+            `L ${p(0, 0)}`,
+            'Z'
+          ].join(' ')
+          return <path d={wallPath} fill="#0F1318" stroke="#27313F" strokeWidth="1" />
+        })()}
 
-      <OrbitControls
-        maxPolarAngle={Math.PI / 2.05}
-        minDistance={4}
-        maxDistance={55}
-        target={[0, warehouseHeight / 3, 0]}
-      />
-    </Canvas>
+        {/* Eave roof outline */}
+        {(() => {
+          const hPx = warehouseHeight * HEIGHT_SCALE
+          const roofPath = [
+            `M ${p(0, 0).split(',')[0]},${parseFloat(p(0, 0).split(',')[1]) - hPx}`,
+            `L ${p(w, 0).split(',')[0]},${parseFloat(p(w, 0).split(',')[1]) - hPx}`,
+          ].join(' ')
+          return <path d={roofPath} fill="none" stroke="#34D399" strokeWidth="2" strokeDasharray="4 2" />
+        })()}
+
+        {/* Beam clearance line */}
+        {(() => {
+          const hPx = beamHeight * HEIGHT_SCALE
+          const beamPath = [
+            `M ${p(0, 0).split(',')[0]},${parseFloat(p(0, 0).split(',')[1]) - hPx}`,
+            `L ${p(w, 0).split(',')[0]},${parseFloat(p(w, 0).split(',')[1]) - hPx}`,
+          ].join(' ')
+          return <path d={beamPath} fill="none" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 2" />
+        })()}
+
+        {/* Equipment footprints on floor */}
+        {equipment.map((item) => {
+          const [ex, , ez] = item.position
+          const el = item.dimensions.length
+          const ew = item.dimensions.width
+          const eh = item.dimensions.height
+          const color = item.fits ? item.color : '#F43F5E'
+          const isSelected = selectedId === item.id
+          const hPx = eh * HEIGHT_SCALE
+
+          // Floor quad
+          const eq = [
+            `M ${p(ex, ez)}`,
+            `L ${p(ex + el, ez)}`,
+            `L ${p(ex + el, ez + ew)}`,
+            `L ${p(ex, ez + ew)}`,
+            'Z',
+          ].join(' ')
+
+          // Height box (just front-left face going up)
+          const topLeft = p(ex, ez)
+          const [tlx, tly] = topLeft.split(',').map(Number)
+          const topPath = [
+            `M ${tlx},${tly}`,
+            `L ${tlx},${tly - hPx}`,
+            `L ${p(ex + el, ez).split(',')[0]},${parseFloat(p(ex + el, ez).split(',')[1]) - hPx}`,
+            `L ${p(ex + el, ez)}`,
+          ].join(' ')
+
+          return (
+            <g
+              key={item.id}
+              onClick={(e) => { e.stopPropagation(); onSelectEquipment(item.id) }}
+              style={{ cursor: 'pointer' }}
+            >
+              {/* Height pillar */}
+              <path
+                d={topPath}
+                fill={color}
+                fillOpacity={isSelected ? 0.5 : 0.3}
+                stroke={color}
+                strokeWidth={isSelected ? 1.5 : 1}
+              />
+              {/* Floor footprint */}
+              <path
+                d={eq}
+                fill={color}
+                fillOpacity={isSelected ? 0.7 : 0.5}
+                stroke={color}
+                strokeWidth={isSelected ? 2 : 1}
+              />
+              {/* Item label */}
+              <text
+                x={parseFloat(p(ex + el / 2, ez + ew / 2).split(',')[0])}
+                y={parseFloat(p(ex + el / 2, ez + ew / 2).split(',')[1]) - hPx - 6}
+                textAnchor="middle"
+                fontSize="8"
+                fontFamily="monospace"
+                fill="#FFFFFF"
+                style={{ pointerEvents: 'none' }}
+              >
+                {item.name} ({eh}m)
+              </text>
+            </g>
+          )
+        })}
+
+        {/* Height ruler on left edge */}
+        {[0, 2, 4, 6, beamHeight, warehouseHeight].map((h) => {
+          const hPx = h * HEIGHT_SCALE
+          const [lx, ly] = p(0, 0).split(',').map(Number)
+          const y = ly - hPx
+          const isBeam = h === beamHeight
+          const isEave = h === warehouseHeight
+          return (
+            <g key={h}>
+              <line x1={lx - 20} y1={y} x2={lx} y2={y} stroke={isBeam ? '#F59E0B' : isEave ? '#34D399' : '#3A4252'} strokeWidth={1} />
+              <text
+                x={lx - 24}
+                y={y + 3}
+                textAnchor="end"
+                fontSize="8"
+                fontFamily="monospace"
+                fill={isBeam ? '#F59E0B' : isEave ? '#34D399' : '#606774'}
+              >
+                {h}m
+              </text>
+            </g>
+          )
+        })}
+
+        {/* Legend */}
+        <g transform={`translate(${CANVAS_W - 140}, 12)`}>
+          <rect x={0} y={0} width={132} height={58} rx={3} fill="#0A0D12" stroke="#27313F" />
+          <line x1={8} y1={16} x2={30} y2={16} stroke="#34D399" strokeWidth="2" strokeDasharray="4 2" />
+          <text x={36} y={20} fontSize="8" fontFamily="monospace" fill="#34D399">EAVE {warehouseHeight}m</text>
+          <line x1={8} y1={30} x2={30} y2={30} stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="3 2" />
+          <text x={36} y={34} fontSize="8" fontFamily="monospace" fill="#F59E0B">TRUSS {beamHeight}m</text>
+          <rect x={8} y={42} width={10} height={6} fill="#10B981" fillOpacity={0.7} />
+          <text x={24} y={49} fontSize="8" fontFamily="monospace" fill="#34D399">FITS CLEARANCE</text>
+        </g>
+
+        {/* Dimension labels */}
+        {(() => {
+          const [ax, ay] = p(w / 2, 0).split(',').map(Number)
+          const [bx, by] = p(0, l / 2).split(',').map(Number)
+          return (
+            <>
+              <text x={ax} y={ay - 8} textAnchor="middle" fontSize="8" fontFamily="monospace" fill="#4B5563">
+                {warehouseWidth}m →
+              </text>
+              <text x={bx - 28} y={by} textAnchor="middle" fontSize="8" fontFamily="monospace" fill="#4B5563">
+                {warehouseLength}m ↓
+              </text>
+            </>
+          )
+        })()}
+      </svg>
+
+      {/* Instruction overlay */}
+      <div style={{
+        position: 'absolute',
+        bottom: '12px',
+        left: '12px',
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.68rem',
+        color: 'var(--text-muted)',
+        background: 'rgba(9, 11, 14, 0.8)',
+        padding: '4px 8px',
+        borderRadius: '3px',
+        border: '1px solid var(--border-subtle)',
+      }}>
+        ISO CAD VIEW • CLICK EQUIPMENT TO SELECT • TRUSS BEAM: {beamHeight}m
+      </div>
+    </div>
   )
 }
 
 // ─── Equipment Library Palette ─────────────────────────────────────
-export interface EquipmentOption {
-  id: string
-  name: string
-  dimensions: { length: number; width: number; height: number }
-  description?: string
-}
-
 interface EquipmentPaletteProps {
   options: EquipmentOption[]
   onPlace: (option: EquipmentOption) => void
@@ -282,7 +318,7 @@ export function EquipmentPalette({ options, onPlace, placedCount }: EquipmentPal
       </div>
 
       <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
-        Click standard logistics model to spawn inside 3D volume:
+        Click standard logistics model to spawn inside clearance volume:
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -303,7 +339,6 @@ export function EquipmentPalette({ options, onPlace, placedCount }: EquipmentPal
               color: 'var(--text-primary)',
               transition: 'all 120ms ease',
             }}
-            className="hover:border-orange-500 hover:bg-neutral-900"
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ fontWeight: 700, fontSize: '0.82rem', fontFamily: 'var(--font-ui)', color: '#FFFFFF' }}>
@@ -363,7 +398,6 @@ export function FitCheckOverlay({ equipment, beamHeight, onClear }: FitCheckProp
             fontSize: '0.7rem',
             fontFamily: 'var(--font-mono)',
           }}
-          className="hover:text-red-400"
         >
           <Trash2 size={12} />
           <span>CLEAR ALL</span>
@@ -371,31 +405,15 @@ export function FitCheckOverlay({ equipment, beamHeight, onClear }: FitCheckProp
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-        <div
-          style={{
-            padding: '8px',
-            background: 'rgba(16, 185, 129, 0.08)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: 'var(--radius-xs)',
-          }}
-        >
+        <div style={{ padding: '8px', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-xs)' }}>
           <span className="mono-tag" style={{ color: 'var(--accent-emerald)', fontSize: '0.62rem' }}>PASSED</span>
           <div className="mono-metric" style={{ fontSize: '1.1rem', fontWeight: 800, color: '#34D399' }}>
             {passing} FIT
           </div>
         </div>
 
-        <div
-          style={{
-            padding: '8px',
-            background: failing > 0 ? 'rgba(244, 63, 94, 0.1)' : 'var(--bg-secondary)',
-            border: `1px solid ${failing > 0 ? 'rgba(244, 63, 94, 0.4)' : 'var(--border-subtle)'}`,
-            borderRadius: 'var(--radius-xs)',
-          }}
-        >
-          <span className="mono-tag" style={{ color: failing > 0 ? 'var(--accent-rose)' : 'var(--text-muted)', fontSize: '0.62rem' }}>
-            CONFLICTS
-          </span>
+        <div style={{ padding: '8px', background: failing > 0 ? 'rgba(244, 63, 94, 0.1)' : 'var(--bg-secondary)', border: `1px solid ${failing > 0 ? 'rgba(244, 63, 94, 0.4)' : 'var(--border-subtle)'}`, borderRadius: 'var(--radius-xs)' }}>
+          <span className="mono-tag" style={{ color: failing > 0 ? '#F87171' : 'var(--text-muted)', fontSize: '0.62rem' }}>CONFLICTS</span>
           <div className="mono-metric" style={{ fontSize: '1.1rem', fontWeight: 800, color: failing > 0 ? '#F87171' : 'var(--text-muted)' }}>
             {failing} COLLISION
           </div>

@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { Crosshair } from 'lucide-react'
 import type { Hotspot } from '@/lib/realsee/types'
 
-const ThreeSpatialTourViewer = dynamic(
-  () => import('./ThreeSpatialTourViewer').then((mod) => mod.ThreeSpatialTourViewer),
+const RealseeSpaceTourViewer = dynamic(
+  () => import('./RealseeSpaceTourViewer').then((mod) => mod.RealseeSpaceTourViewer),
   {
     ssr: false,
     loading: () => (
@@ -31,10 +31,11 @@ const ThreeSpatialTourViewer = dynamic(
 
 interface DossierTourPreviewProps {
   listingId: string
+  workId?: string
   hotspots?: Hotspot[]
 }
 
-export function DossierTourPreview({ listingId, hotspots = [] }: DossierTourPreviewProps) {
+export function DossierTourPreview({ listingId, workId = '80P29aOvr7kw98eDxE', hotspots = [] }: DossierTourPreviewProps) {
   return (
     <div
       className="hud-panel corner-brackets"
@@ -61,11 +62,9 @@ export function DossierTourPreview({ listingId, hotspots = [] }: DossierTourPrev
       </div>
 
       <div style={{ flex: 1, position: 'relative', background: '#000000' }}>
-        <ThreeSpatialTourViewer
-          panoramaUrl="/mock/alhusnain/IMG_20260523_100706_00_091.jpg"
+        <RealseeSpaceTourViewer
+          workId={workId}
           hotspots={hotspots}
-          activeHotspot={null}
-          onSelectHotspot={() => {}}
         />
       </div>
     </div>

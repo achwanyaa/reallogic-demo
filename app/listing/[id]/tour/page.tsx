@@ -18,12 +18,12 @@ import {
 import { HotspotMarker } from '@/components/tour/HotspotMarker'
 import { HotspotInfoCard } from '@/components/tour/HotspotInfoCard'
 import { TierBadge } from '@/components/ui/TierBadge'
-import { getListing, getHotspots, getVantagePoints } from '@/lib/data'
-import type { Listing, Hotspot, VantagePoint } from '@/lib/realsee/types'
+import { getListing, getHotspots } from '@/lib/data'
+import type { Listing, Hotspot } from '@/lib/realsee/types'
 
-// Dynamic import for WebGL Three.js Spatial Tour Viewer (SSR-safe)
-const ThreeSpatialTourViewer = dynamic(
-  () => import('@/components/tour/ThreeSpatialTourViewer').then((mod) => mod.ThreeSpatialTourViewer),
+// Dynamic import for @realsee/five Spatial Tour Viewer (SSR-safe — needs browser WebGL)
+const RealseeSpaceTourViewer = dynamic(
+  () => import('@/components/tour/RealseeSpaceTourViewer').then((mod) => mod.RealseeSpaceTourViewer),
   {
     ssr: false,
     loading: () => (
@@ -52,25 +52,15 @@ export default function TourPage() {
   const [listing, setListing] = useState<Listing | null>(null)
   const [hotspots, setHotspots] = useState<Hotspot[]>([])
   const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(null)
-  const [viewMode, setViewMode] = useState<'3d-tour' | 'hotspots'>('3d-tour')
   const [activeFloorLayer, setActiveFloorLayer] = useState<'ground' | 'mezzanine' | 'truss'>('ground')
   const [measurementActive, setMeasurementActive] = useState(false)
-  const [vantagePoints, setVantagePoints] = useState<VantagePoint[]>([])
-  const [activeVantage, setActiveVantage] = useState<VantagePoint | null>(null)
 
   useEffect(() => {
     getListing(id).then(setListing)
     getHotspots(id).then(setHotspots)
-    getVantagePoints(id).then((points) => {
-      setVantagePoints(points)
-      if (points.length > 0) {
-        setActiveVantage(points[0])
-      }
-    })
   }, [id])
 
   const workId = listing?.realsee_work_id || '80P29aOvr7kw98eDxE'
-  const panoramaUrl = activeVantage?.panoUrl || '/mock/alhusnain/IMG_20260523_100706_00_091.jpg'
 
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
@@ -108,63 +98,27 @@ export default function TourPage() {
           <TierBadge tier="live" />
         </div>
 
-        {/* View Mode Toggle Controls */}
+        {/* View Mode — handled by the Five SDK viewer's own internal toolbar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <div
             style={{
               display: 'flex',
-              background: 'var(--bg-secondary)',
-              padding: '3px',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              background: 'rgba(249, 115, 22, 0.12)',
+              border: '1px solid rgba(249, 115, 22, 0.4)',
               borderRadius: 'var(--radius-xs)',
-              border: '1px solid var(--border-medium)',
-              gap: '4px',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.75rem',
+              color: '#FFFFFF',
+              fontWeight: 700,
             }}
           >
-            <button
-              onClick={() => setViewMode('3d-tour')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                fontSize: '0.75rem',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 700,
-                borderRadius: 'var(--radius-xs)',
-                border: 'none',
-                cursor: 'pointer',
-                background: viewMode === '3d-tour' ? 'var(--accent-orange)' : 'transparent',
-                color: viewMode === '3d-tour' ? '#000000' : 'var(--text-secondary)',
-                transition: 'all 120ms ease',
-              }}
-            >
-              <Eye size={13} />
-              <span>3D SPATIAL TOUR</span>
-            </button>
-            <button
-              onClick={() => setViewMode('hotspots')}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                fontSize: '0.75rem',
-                fontFamily: 'var(--font-mono)',
-                fontWeight: 700,
-                borderRadius: 'var(--radius-xs)',
-                border: 'none',
-                cursor: 'pointer',
-                background: viewMode === 'hotspots' ? 'var(--accent-orange)' : 'transparent',
-                color: viewMode === 'hotspots' ? '#000000' : 'var(--text-secondary)',
-                transition: 'all 120ms ease',
-              }}
-            >
-              <Crosshair size={13} />
-              <span>ENGINEERING HOTSPOTS</span>
-            </button>
+            <Eye size={13} color="var(--accent-orange)" />
+            <span>SPATIAL TWIN ACTIVE</span>
           </div>
-
-          <TierBadge tier="in-development" />
+          <TierBadge tier="live" />
         </div>
       </div>
 
@@ -255,15 +209,9 @@ export default function TourPage() {
           background: '#000000',
         }}
       >
-        <ThreeSpatialTourViewer
-          panoramaUrl={panoramaUrl}
+        <RealseeSpaceTourViewer
+          workId={workId}
           hotspots={hotspots}
-          activeHotspot={activeHotspot}
-          onSelectHotspot={setActiveHotspot}
-          activeFloorLayer={activeFloorLayer}
-          vantagePoints={vantagePoints}
-          activeVantageId={activeVantage?.id}
-          onSelectVantage={setActiveVantage}
         />
 
         {/* Measurement Reticle Overlay (if enabled) */}

@@ -1,8 +1,6 @@
-// GET /api/realsee/work/[workId]
-// Server-side proxy for Realsee work.json space data
-
 import { NextResponse } from 'next/server'
 import { realseeAdapter } from '@/lib/realsee/adapter'
+import { fetchWorkFromShareLink } from '@/lib/realsee/share-resolver'
 
 export async function GET(
   request: Request,
@@ -18,27 +16,33 @@ export async function GET(
       )
     }
 
+    // Step 1: Try official Realsee OpenAPI first
     if (realseeAdapter.getWorkData) {
-      const data = await realseeAdapter.getWorkData(workId)
-
-      // Realsee returns { data: null, code: -1 } when the work ID doesn't exist
-      // or belongs to a different account — surface this as a clear 404.
-      if (data === null || data === undefined) {
-        return NextResponse.json(
-          {
-            error: 'Work not found or not accessible with current credentials.',
-            hint: 'Ensure the work ID belongs to the account matching REALSEE_APP_ID.',
-            workId,
-          },
-          { status: 404 }
-        )
+      try {
+        const data = await realseeAdapter.getWorkData(workId)
+        if (data && typeof data === 'object' && (data.observers || data.panorama || data.model || data.base_url)) {
+          return NextResponse.json(data)
+        }
+      } catch (apiErr) {
+        console.warn('[API] OpenAPI lookup failed, attempting fallback resolver:', apiErr)
       }
-
-      return NextResponse.json(data)
     }
 
-    const result = await realseeAdapter.getEmbedToken(workId)
-    return NextResponse.json(result)
+    // Step 2: Fallback to direct share link / work code resolver
+    const shareData = await fetchWorkFromShareLink(workId)
+    if (shareData) {
+      return NextResponse.json(shareData)
+    }
+
+    // Step 3: If still not found, return clean 404
+    return NextResponse.json(
+      {
+        error: 'Work not found or not accessible with current credentials.',
+        hint: 'Ensure the work ID or share code (e.g. 7kyyNwq8) is valid.',
+        workId,
+      },
+      { status: 404 }
+    )
   } catch (error: any) {
     console.error('[API] work data error:', error)
     return NextResponse.json(

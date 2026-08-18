@@ -14,7 +14,7 @@ export const mockListing: Listing = {
   rent_ksh_per_sqft: 35,
   service_charge_ksh_per_sqft: 8,
   tier: 'live',
-  realsee_work_id: '80P29aOvr7kw98eDxE',
+  realsee_work_id: '7kyyNwq8',
   created_at: new Date().toISOString(),
 }
 

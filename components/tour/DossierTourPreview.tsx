@@ -35,7 +35,7 @@ interface DossierTourPreviewProps {
   hotspots?: Hotspot[]
 }
 
-export function DossierTourPreview({ listingId, workId = '80P29aOvr7kw98eDxE', hotspots = [] }: DossierTourPreviewProps) {
+export function DossierTourPreview({ listingId, workId = '7kyyNwq8', hotspots = [] }: DossierTourPreviewProps) {
   return (
     <div
       className="hud-panel corner-brackets"

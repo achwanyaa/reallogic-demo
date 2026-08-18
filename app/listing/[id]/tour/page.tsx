@@ -60,7 +60,7 @@ export default function TourPage() {
     getHotspots(id).then(setHotspots)
   }, [id])
 
-  const workId = listing?.realsee_work_id || '80P29aOvr7kw98eDxE'
+  const workId = listing?.realsee_work_id || '7kyyNwq8'
 
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>

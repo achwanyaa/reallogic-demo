@@ -11,7 +11,7 @@ insert into listings (id, title, location, size_sqft, rent_ksh_per_sqft, service
   35,
   8,
   'live',
-  '80P29aOvr7kw98eDxE'
+  '7kyyNwq8'
 )
 on conflict (id) do update set
   title = excluded.title,

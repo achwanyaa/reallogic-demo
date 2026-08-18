@@ -8,13 +8,13 @@ export const SAMPLE_LISTING_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
 
 export const mockListing: Listing = {
   id: SAMPLE_LISTING_ID,
-  title: 'ONLYYOU ELGEYO 2',
+  title: 'ONLYOU ELGEYO',
   location: 'Elgeyo Marakwet Road, Nairobi',
   size_sqft: 10200,
   rent_ksh_per_sqft: 35,
   service_charge_ksh_per_sqft: 8,
   tier: 'live',
-  realsee_work_id: 'LmryyELeYI4B80i5DZ',
+  realsee_work_id: '80P29aOvr7kw98eDxE',
   created_at: new Date().toISOString(),
 }
 

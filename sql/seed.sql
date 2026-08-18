@@ -5,13 +5,13 @@
 -- ─── Sample Listing ─────────────────────────────────────────────────
 insert into listings (id, title, location, size_sqft, rent_ksh_per_sqft, service_charge_ksh_per_sqft, tier, realsee_work_id) values (
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  'ONLYYOU ELGEYO 2',
+  'ONLYOU ELGEYO',
   'Elgeyo Marakwet Road, Nairobi',
   10200,
   35,
   8,
   'live',
-  'LmryyELeYI4B80i5DZ'
+  '80P29aOvr7kw98eDxE'
 )
 on conflict (id) do update set
   title = excluded.title,

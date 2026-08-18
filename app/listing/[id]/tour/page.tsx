@@ -49,7 +49,7 @@ export default function TourPage() {
     getHotspots(id).then(setHotspots)
   }, [id])
 
-  const workId = listing?.realsee_work_id || 'LmryyELeYI4B80i5DZ'
+  const workId = listing?.realsee_work_id || '80P29aOvr7kw98eDxE'
   const panoramaUrl = '/mock/pano-warehouse-main.jpg'
 
   return (

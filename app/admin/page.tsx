@@ -46,8 +46,8 @@ export default function AdminPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Custom VR ID binder
-  const [customVrId, setCustomVrId] = useState('LmryyELeYI4B80i5DZ')
-  const [customListingTitle, setCustomListingTitle] = useState('ONLYYOU ELGEYO 2')
+  const [customVrId, setCustomVrId] = useState('80P29aOvr7kw98eDxE')
+  const [customListingTitle, setCustomListingTitle] = useState('ONLYOU ELGEYO')
 
   useEffect(() => {
     getAllListings().then(setListings)
@@ -488,10 +488,17 @@ export default function AdminPage() {
               <div style={{ display: 'flex', gap: '8px', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                 <span>PRESET SPACES:</span>
                 <button
-                  onClick={() => setCustomVrId('LmryyELeYI4B80i5DZ')}
+                  onClick={() => setCustomVrId('80P29aOvr7kw98eDxE')}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-emerald)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 700 }}
                 >
-                  ONLYYOU ELGEYO 2 (Active Live 3D)
+                  ONLYOU ELGEYO (Live 3D)
+                </button>
+                <span>•</span>
+                <button
+                  onClick={() => setCustomVrId('80QXy9Z85XY37vYa06')}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  ONLYOU ELGEYO 1
                 </button>
                 <span>•</span>
                 <button
@@ -499,13 +506,6 @@ export default function AdminPage() {
                   style={{ background: 'none', border: 'none', color: 'var(--accent-orange)', cursor: 'pointer', textDecoration: 'underline' }}
                 >
                   Deluxe Lounge (LiDAR)
-                </button>
-                <span>•</span>
-                <button
-                  onClick={() => setCustomVrId('BD0ggLIAlcjVaVf1oN')}
-                  style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  Elgeyo Pano Demo
                 </button>
               </div>
             </div>

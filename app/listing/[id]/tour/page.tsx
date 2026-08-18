@@ -3,36 +3,48 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import {
   Eye,
   Crosshair,
   Ruler,
   Layers,
   ChevronLeft,
-  ShieldCheck,
-  Maximize2,
   Compass,
   Zap,
   Truck,
   Gauge,
-  Info,
 } from 'lucide-react'
-import { PanoramaViewer } from '@/components/tour/PanoramaViewer'
 import { HotspotMarker } from '@/components/tour/HotspotMarker'
 import { HotspotInfoCard } from '@/components/tour/HotspotInfoCard'
 import { TierBadge } from '@/components/ui/TierBadge'
 import { getListing, getHotspots } from '@/lib/data'
 import type { Listing, Hotspot } from '@/lib/realsee/types'
 
-// Map 3D scene positions to 2D overlay percentages for the demo
-function scenePositionToOverlay(pos: { x: number; y: number; z: number }) {
-  const x = ((pos.x + 6) / 12) * 100
-  const y = ((4 - pos.y) / 5) * 100
-  return {
-    x: Math.max(8, Math.min(92, x)),
-    y: Math.max(12, Math.min(88, y)),
+// Dynamic import for WebGL Three.js Spatial Tour Viewer (SSR-safe)
+const ThreeSpatialTourViewer = dynamic(
+  () => import('@/components/tour/ThreeSpatialTourViewer').then((mod) => mod.ThreeSpatialTourViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          background: 'var(--bg-void)',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.85rem',
+          color: 'var(--accent-orange)',
+        }}
+      >
+        <span className="status-pulse-orange" style={{ marginRight: '8px' }} />
+        INITIALIZING SPATIAL TWIN VIEWPORT...
+      </div>
+    ),
   }
-}
+)
 
 export default function TourPage() {
   const params = useParams()
@@ -40,7 +52,7 @@ export default function TourPage() {
   const [listing, setListing] = useState<Listing | null>(null)
   const [hotspots, setHotspots] = useState<Hotspot[]>([])
   const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(null)
-  const [viewMode, setViewMode] = useState<'3d-realsee' | 'hotspots'>('3d-realsee')
+  const [viewMode, setViewMode] = useState<'3d-tour' | 'hotspots'>('3d-tour')
   const [activeFloorLayer, setActiveFloorLayer] = useState<'ground' | 'mezzanine' | 'truss'>('ground')
   const [measurementActive, setMeasurementActive] = useState(false)
 
@@ -101,7 +113,7 @@ export default function TourPage() {
             }}
           >
             <button
-              onClick={() => setViewMode('3d-realsee')}
+              onClick={() => setViewMode('3d-tour')}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -113,13 +125,13 @@ export default function TourPage() {
                 borderRadius: 'var(--radius-xs)',
                 border: 'none',
                 cursor: 'pointer',
-                background: viewMode === '3d-realsee' ? 'var(--accent-orange)' : 'transparent',
-                color: viewMode === '3d-realsee' ? '#000000' : 'var(--text-secondary)',
+                background: viewMode === '3d-tour' ? 'var(--accent-orange)' : 'transparent',
+                color: viewMode === '3d-tour' ? '#000000' : 'var(--text-secondary)',
                 transition: 'all 120ms ease',
               }}
             >
               <Eye size={13} />
-              <span>REALSEE 3D TOUR</span>
+              <span>3D SPATIAL TOUR</span>
             </button>
             <button
               onClick={() => setViewMode('hotspots')}
@@ -172,7 +184,7 @@ export default function TourPage() {
             ORIENTATION: TRUE NORTH [0.0°]
           </span>
           <span className="hidden sm:inline" style={{ color: 'var(--border-strong)' }}>|</span>
-          <span className="hidden sm:inline">WORK ID: [{workId}]</span>
+          <span className="hidden sm:inline">SPATIAL TWIN ID: [{workId}]</span>
         </div>
 
         {/* Floor Layer Filter & Measurement Toggle */}
@@ -222,7 +234,7 @@ export default function TourPage() {
         </div>
       </div>
 
-      {/* ─── Main 3D Spatial Canvas ───────────────────────────────── */}
+      {/* ─── Main 3D Spatial Canvas (Self-Rendered WebGL Digital Twin) ── */}
       <div
         className="hud-panel"
         style={{
@@ -235,40 +247,13 @@ export default function TourPage() {
           background: '#000000',
         }}
       >
-        {viewMode === '3d-realsee' ? (
-          <iframe
-            src={`https://realsee.ai/tour/${workId}?autoplay=0`}
-            title="Realsee 3D Spatial Walkthrough"
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              display: 'block',
-            }}
-            allow="fullscreen; accelerometer; gyroscope; magnetometer; vr"
-            allowFullScreen
-          />
-        ) : (
-          <PanoramaViewer imageUrl={panoramaUrl}>
-            {/* Hotspot Markers Overlaid in 3D Scene */}
-            {hotspots.map((hotspot) => {
-              const pos = scenePositionToOverlay(hotspot.position)
-              return (
-                <HotspotMarker
-                  key={hotspot.id}
-                  category={hotspot.category}
-                  label={hotspot.label}
-                  x={pos.x}
-                  y={pos.y}
-                  isActive={activeHotspot?.id === hotspot.id}
-                  onClick={() =>
-                    setActiveHotspot(activeHotspot?.id === hotspot.id ? null : hotspot)
-                  }
-                />
-              )
-            })}
-          </PanoramaViewer>
-        )}
+        <ThreeSpatialTourViewer
+          panoramaUrl={panoramaUrl}
+          hotspots={hotspots}
+          activeHotspot={activeHotspot}
+          onSelectHotspot={setActiveHotspot}
+          activeFloorLayer={activeFloorLayer}
+        />
 
         {/* Measurement Reticle Overlay (if enabled) */}
         {measurementActive && (
@@ -293,13 +278,13 @@ export default function TourPage() {
               <span style={{ fontWeight: 700 }}>IN-VIEWER CAD MEASURE</span>
             </div>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>
-              Click two points in 3D scene to calculate millimeter distance.
+              Drag to orient camera and inspect coordinates in real time.
             </p>
           </div>
         )}
 
         {/* Active Hotspot Inspector Card */}
-        {viewMode === 'hotspots' && activeHotspot && (
+        {activeHotspot && (
           <div
             style={{
               position: 'absolute',
@@ -332,7 +317,7 @@ export default function TourPage() {
       >
         {[
           { label: 'FLOOR SLAB (50 kN/m²)', color: 'var(--accent-orange)', icon: Gauge },
-          { label: 'CLEAR HEIGHT (11.85m APEX)', color: 'var(--accent-emerald)', icon: Ruler },
+          { label: 'CLEAR HEIGHT (8.50m EAVE / 7.20m BEAM)', color: 'var(--accent-emerald)', icon: Ruler },
           { label: '3-PHASE POWER (415V/200A)', color: 'var(--accent-amber)', icon: Zap },
           { label: 'LOGISTICS & DOCK ACCESS', color: 'var(--accent-cyan)', icon: Truck },
         ].map((item) => {

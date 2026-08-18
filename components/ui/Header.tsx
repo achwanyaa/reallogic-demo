@@ -50,7 +50,7 @@ export function Header() {
           </span>
           <span className="hidden sm:inline" style={{ color: 'var(--border-strong)' }}>|</span>
           <span className="hidden sm:inline" style={{ color: 'var(--text-secondary)' }}>
-            ENGINE: REALSEE GALOIS / ARGUS V6.8
+            SPATIAL ENGINE: ONLINE • ACCURACY: ±15mm
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

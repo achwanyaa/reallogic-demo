@@ -72,7 +72,7 @@ export default function LandingPage() {
       status: 'OPERATIONAL NOW',
       description: 'Zero-latency 3D mesh exploration with complete server-side token isolation.',
       items: [
-        '360° / LiDAR Galois Photogrammetry Mesh',
+        '360° LiDAR Photogrammetry Digital Twin',
         'Multi-axis Dollhouse & Floor Plan Navigation',
         'Server-Side API Proxying (Zero Browser Key Leaks)',
         'Full WebGL / Three.js Viewport Integration',
@@ -151,9 +151,9 @@ export default function LandingPage() {
           <span className="status-pulse-emerald" style={{ width: '6px', height: '6px' }} />
           <span style={{ color: 'var(--accent-emerald)', fontWeight: 700 }}>[SYSTEM: OPERATIONAL]</span>
           <span style={{ color: 'var(--border-strong)' }}>•</span>
-          <span>REALSEE ARGUS V6.8 ACTIVE</span>
+          <span>PHOTOGRAMMETRY PIPELINE ONLINE</span>
           <span style={{ color: 'var(--border-strong)' }}>•</span>
-          <span style={{ color: 'var(--accent-orange)' }}>SPATIAL TWIN ONLINE</span>
+          <span style={{ color: 'var(--accent-orange)' }}>SPATIAL TWIN ACTIVE</span>
         </div>
 
         {/* Hero Title & Subheadline */}
@@ -497,7 +497,7 @@ export default function LandingPage() {
             </h2>
           </div>
           <span className="mono-metric" style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-            1 ACTIVE REALSEE TWIN
+            1 ACTIVE SPATIAL TWIN
           </span>
         </div>
 

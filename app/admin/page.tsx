@@ -47,7 +47,7 @@ export default function AdminPage() {
 
   // Custom VR ID binder
   const [customVrId, setCustomVrId] = useState('80P29aOvr7kw98eDxE')
-  const [customListingTitle, setCustomListingTitle] = useState('ONLYOU ELGEYO')
+  const [customListingTitle, setCustomListingTitle] = useState('Godown Unit A3 — Industrial Area')
 
   useEffect(() => {
     getAllListings().then(setListings)
@@ -122,7 +122,7 @@ export default function AdminPage() {
 
       const jobId = data.jobId
       setReconstructJobId(jobId)
-      setReconstructStatus(`JOB DISPATCHED: [${jobId}] • POLLING REALSEE ARGUS...`)
+      setReconstructStatus(`JOB DISPATCHED: [${jobId}] • POLLING SPATIAL RECONSTRUCTION PIPELINE...`)
 
       // Poll job status
       const pollInterval = setInterval(async () => {
@@ -136,10 +136,10 @@ export default function AdminPage() {
             setIsReconstructing(false)
           } else if (pollData.status === 'failed') {
             clearInterval(pollInterval)
-            setReconstructStatus('FAILED: Realsee Argus was unable to build 3D mesh from the given images.')
+            setReconstructStatus('FAILED: Pipeline was unable to build 3D mesh from the given images.')
             setIsReconstructing(false)
           } else {
-            setReconstructStatus(`PROCESSING: Realsee Argus AI generating point clouds & 3D mesh (Status: ${pollData.status})...`)
+            setReconstructStatus(`PROCESSING: Spatial AI generating point clouds & 3D mesh (Status: ${pollData.status})...`)
           }
         } catch (e) {
           // ignore transient poll error
@@ -187,7 +187,7 @@ export default function AdminPage() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span className="mono-metric" style={{ fontSize: '0.72rem', color: 'var(--accent-emerald)' }}>
-            [REALSEE LIVE ADAPTER: READY]
+            [SPATIAL ADAPTER: READY]
           </span>
         </div>
       </div>
@@ -367,16 +367,16 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Realsee Argus AI 3D Reconstruction Action */}
+            {/* Spatial AI 3D Reconstruction Action */}
             <div className="hud-panel" style={{ padding: '20px', borderLeft: '3px solid var(--accent-orange)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <Sparkles size={16} color="var(--accent-orange)" />
                 <span className="mono-tag" style={{ color: 'var(--accent-orange)' }}>
-                  REALSEE ARGUS AI 3D RECONSTRUCTION
+                  AI 3D SPATIAL RECONSTRUCTION PIPELINE
                 </span>
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5, marginBottom: '14px' }}>
-                Upload 1 or more panoramas and send to Realsee Argus to automatically generate point clouds, 3D floor plans, and a complete spatial VR Space ID.
+                Upload 1 or more panoramas and dispatch to automated photogrammetry pipeline to generate point clouds, 3D floor plans, and spatial digital twins.
               </p>
 
               <button
@@ -393,7 +393,7 @@ export default function AdminPage() {
                 ) : (
                   <>
                     <Play size={14} />
-                    <span>DISPATCH ARGUS 3D RECONSTRUCTION ({uploadedFiles.length} IMAGES)</span>
+                    <span>DISPATCH 3D SPATIAL RECONSTRUCTION ({uploadedFiles.length} IMAGES)</span>
                   </>
                 )}
               </button>
@@ -445,16 +445,16 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Bind Existing Realsee VR ID Quick-Launcher */}
+            {/* Bind Existing Spatial Twin ID Quick-Launcher */}
             <div className="hud-panel" style={{ padding: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 <Terminal size={15} color="var(--accent-cyan)" />
                 <span className="mono-tag" style={{ color: 'var(--accent-cyan)' }}>
-                  BIND LIVE REALSEE SPACE / WORK CODE
+                  BIND LIVE SPATIAL TWIN / SCENE ID
                 </span>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '12px' }}>
-                Already have a live Galois LiDAR or Pano space? Enter its VR ID to preview with structural HUD:
+                Already have a live photogrammetry or point cloud model? Enter its Scene ID to preview with structural HUD:
               </p>
 
               <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
@@ -491,21 +491,21 @@ export default function AdminPage() {
                   onClick={() => setCustomVrId('80P29aOvr7kw98eDxE')}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-emerald)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 700 }}
                 >
-                  ONLYOU ELGEYO (Live 3D)
+                  Godown Unit A3 (Active Spatial Twin)
                 </button>
                 <span>•</span>
                 <button
                   onClick={() => setCustomVrId('80QXy9Z85XY37vYa06')}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', textDecoration: 'underline' }}
                 >
-                  ONLYOU ELGEYO 1
+                  Mombasa Rd Godown Bay 2
                 </button>
                 <span>•</span>
                 <button
                   onClick={() => setCustomVrId('nmRVg9JX4Cl62XiXmP')}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-orange)', cursor: 'pointer', textDecoration: 'underline' }}
                 >
-                  Deluxe Lounge (LiDAR)
+                  Industrial Logistics Suite
                 </button>
               </div>
             </div>

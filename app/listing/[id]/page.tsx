@@ -18,7 +18,8 @@ import {
 import { TierBadge } from '@/components/ui/TierBadge'
 import { VerifiedBadge } from '@/components/listing/VerifiedBadge'
 import { Tier3PreviewCards } from '@/components/listing/Tier3PreviewCards'
-import { getListing, getCaptureVerification } from '@/lib/data'
+import { DossierTourPreview } from '@/components/tour/DossierTourPreview'
+import { getListing, getCaptureVerification, getHotspots } from '@/lib/data'
 import type { TierLevel } from '@/lib/realsee/types'
 
 interface ListingPageProps {
@@ -29,6 +30,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
   const { id } = await params
   const listing = await getListing(id)
   const verification = await getCaptureVerification(id)
+  const hotspots = await getHotspots(id)
 
   if (!listing) {
     return (
@@ -89,7 +91,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span className="mono-metric" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            REALSEE ID: [{workId}]
+            SPATIAL TWIN ID: [{workId}]
           </span>
           <TierBadge tier="live" />
         </div>
@@ -191,39 +193,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
       >
         {/* Left Column (60%): Interactive 3D Spatial Viewport Preview */}
         <div className="lg:col-span-7 flex flex-col gap-4">
-          <div
-            className="hud-panel corner-brackets"
-            style={{
-              height: '460px',
-              borderRadius: 'var(--radius-xs)',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div className="hud-panel-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Crosshair size={14} color="var(--accent-emerald)" />
-                <span>ACTIVE 3D DIGITAL TWIN • REALSEE GALOIS VIEWPORT</span>
-              </div>
-              <Link
-                href={`/listing/${id}/tour`}
-                className="mono-metric"
-                style={{ fontSize: '0.72rem', color: 'var(--accent-orange)', textDecoration: 'none' }}
-              >
-                FULLSCREEN →
-              </Link>
-            </div>
-
-            <div style={{ flex: 1, position: 'relative', background: '#000000' }}>
-              <iframe
-                src={`https://realsee.ai/tour/${workId}?autoplay=0`}
-                title="3D Tour Preview"
-                style={{ width: '100%', height: '100%', border: 'none' }}
-                allow="fullscreen; accelerometer; gyroscope; magnetometer; vr"
-              />
-            </div>
-          </div>
+          <DossierTourPreview listingId={id} hotspots={hotspots} />
 
           <div
             style={{
@@ -238,8 +208,8 @@ export default async function ListingPage({ params }: ListingPageProps) {
               color: 'var(--text-muted)',
             }}
           >
-            <span>CAMERA ORIENTATION: 360° LiDAR</span>
-            <span style={{ color: 'var(--accent-emerald)' }}>MESH RESOLUTION: HIGH (4K HDR)</span>
+            <span>ORIENTATION: 360° PHOTOGRAMMETRY</span>
+            <span style={{ color: 'var(--accent-emerald)' }}>RENDER RESOLUTION: NATIVE 4K HDR</span>
           </div>
         </div>
 

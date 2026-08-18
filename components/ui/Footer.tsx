@@ -43,7 +43,7 @@ export function Footer() {
             <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>ENGINE CORE</span>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
-            Realsee Five SDK Engine + Argus VGGT Pipeline. Server-side token exchange with proxy isolation for spatial twins.
+            High-Performance WebGL Spatial Mesh Engine & Photogrammetry Pipeline. Server-side token exchange with proxy isolation.
           </p>
         </div>
 

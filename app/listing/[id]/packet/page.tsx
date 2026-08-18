@@ -1,4 +1,8 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import {
   Printer,
   ChevronLeft,
@@ -15,16 +19,18 @@ import {
 } from 'lucide-react'
 import { TierBadge } from '@/components/ui/TierBadge'
 import { getListing, getCaptureVerification } from '@/lib/data'
+import type { Listing, CaptureVerification } from '@/lib/realsee/types'
 
-interface PacketPageProps {
-  params: Promise<{ id: string }>
-}
+export default function PacketPage() {
+  const params = useParams()
+  const id = params.id as string
+  const [listing, setListing] = useState<Listing | null>(null)
+  const [verification, setVerification] = useState<CaptureVerification | null>(null)
 
-export default async function PacketPage({ params }: PacketPageProps) {
-  const { id } = await params
-  const listing = await getListing(id)
-  const verification = await getCaptureVerification(id)
-  const workId = listing?.realsee_work_id || '80P29aOvr7kw98eDxE'
+  useEffect(() => {
+    getListing(id).then(setListing)
+    getCaptureVerification(id).then(setVerification)
+  }, [id])
 
   const sections = [
     {
@@ -73,6 +79,12 @@ export default async function PacketPage({ params }: PacketPageProps) {
     },
   ]
 
+  const handlePrint = () => {
+    if (typeof window !== 'undefined') {
+      window.print()
+    }
+  }
+
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '32px 24px 80px' }}>
       {/* Non-printable Navigation Bar */}
@@ -106,7 +118,7 @@ export default async function PacketPage({ params }: PacketPageProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <TierBadge tier="coming-with-partnership" size="md" />
           <button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="tech-btn-primary"
             style={{ padding: '8px 16px', fontSize: '0.78rem' }}
           >
@@ -174,8 +186,8 @@ export default async function PacketPage({ params }: PacketPageProps) {
             }}
           >
             <p style={{ color: '#FFFFFF', fontWeight: 700 }}>REPORT REF: RL-NBI-2026-0047</p>
-            <p>SURVEY ENGINE: REALSEE GALOIS LiDAR</p>
-            <p>ISSUED: {new Date().toISOString().split('T')[0]}</p>
+            <p>SURVEY ENGINE: CERTIFIED LiDAR POINT CLOUD</p>
+            <p>ISSUED: 2026-08-14</p>
             <p style={{ color: 'var(--accent-emerald)', marginTop: '4px' }}>STATUS: VERIFIED ON-SITE</p>
           </div>
         </div>
@@ -268,7 +280,7 @@ export default async function PacketPage({ params }: PacketPageProps) {
               </span>
             </div>
             <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              This technical packet was derived directly from on-site LiDAR scans captured by Reallogic Certified Surveyor (#042). 
+              This technical packet was derived directly from on-site LiDAR scans captured by Reallogic Certified Surveyor (#047). 
               Dimensional variance is guaranteed within ±15mm tolerance across the entire 10,200 sqft floor plate.
             </p>
           </div>

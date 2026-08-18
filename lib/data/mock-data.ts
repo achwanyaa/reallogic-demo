@@ -8,8 +8,8 @@ export const SAMPLE_LISTING_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
 
 export const mockListing: Listing = {
   id: SAMPLE_LISTING_ID,
-  title: 'ONLYOU ELGEYO',
-  location: 'Elgeyo Marakwet Road, Nairobi',
+  title: 'Godown Unit A3 — Industrial Area',
+  location: 'Off Mombasa Road, Industrial Area, Nairobi',
   size_sqft: 10200,
   rent_ksh_per_sqft: 35,
   service_charge_ksh_per_sqft: 8,
@@ -102,8 +102,8 @@ export const mockEquipmentModels: EquipmentModel[] = [
 export const mockCaptureVerification: CaptureVerification = {
   id: 'cv-001',
   listing_id: SAMPLE_LISTING_ID,
-  operator_id: 'OP-NBI-2024-047',
+  operator_id: 'OP-NBI-2026-047',
   capture_type: 'actual_visit',
-  captured_at: '2024-11-15T10:30:00Z',
+  captured_at: '2026-08-14T10:30:00Z',
   created_at: new Date().toISOString(),
 }

@@ -214,19 +214,19 @@ export default function ClearancePage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>WIDTH (X):</span>
-                <p style={{ color: '#FFFFFF', fontWeight: 700 }}>{WAREHOUSE.width}.00 m</p>
+                <p style={{ color: '#FFFFFF', fontWeight: 700 }}>{WAREHOUSE.width.toFixed(2)} m</p>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>LENGTH (Z):</span>
-                <p style={{ color: '#FFFFFF', fontWeight: 700 }}>{WAREHOUSE.length}.00 m</p>
+                <p style={{ color: '#FFFFFF', fontWeight: 700 }}>{WAREHOUSE.length.toFixed(2)} m</p>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>EAVE HEIGHT:</span>
-                <p style={{ color: '#FFFFFF', fontWeight: 700 }}>{WAREHOUSE.eaveHeight}.00 m</p>
+                <p style={{ color: '#FFFFFF', fontWeight: 700 }}>{WAREHOUSE.eaveHeight.toFixed(2)} m</p>
               </div>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>LOWEST TRUSS:</span>
-                <p style={{ color: 'var(--accent-amber)', fontWeight: 700 }}>{WAREHOUSE.beamHeight}.00 m</p>
+                <p style={{ color: 'var(--accent-amber)', fontWeight: 700 }}>{WAREHOUSE.beamHeight.toFixed(2)} m</p>
               </div>
             </div>
           </div>

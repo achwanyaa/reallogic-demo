@@ -26,7 +26,7 @@ const TIER3_FEATURES: Tier3Card[] = [
     title: 'SCAN-TO-BIM / CAD EXPORT',
     specCode: 'AUTODESK-IFC-REVIT',
     description:
-      'Direct conversion from Realsee LiDAR point clouds into Revit (.RVT), IFC, and 2D CAD DWG structural layers.',
+      'Direct conversion from on-site LiDAR point clouds into Revit (.RVT), IFC, and 2D CAD DWG structural layers.',
     icon: Building2,
     badgeText: 'COMING WITH PARTNERSHIP',
   },

@@ -5,8 +5,8 @@
 -- ─── Sample Listing ─────────────────────────────────────────────────
 insert into listings (id, title, location, size_sqft, rent_ksh_per_sqft, service_charge_ksh_per_sqft, tier, realsee_work_id) values (
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  'ONLYOU ELGEYO',
-  'Elgeyo Marakwet Road, Nairobi',
+  'Godown Unit A3 — Industrial Area',
+  'Off Mombasa Road, Industrial Area, Nairobi',
   10200,
   35,
   8,
@@ -65,7 +65,7 @@ insert into equipment_models (name, glb_url, dimensions_m) values
 -- ─── Capture Verification ───────────────────────────────────────────
 insert into capture_verification (listing_id, operator_id, capture_type, captured_at) values (
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  'OP-NBI-2024-047',
+  'OP-NBI-2026-047',
   'actual_visit',
-  '2024-11-15T10:30:00Z'
+  '2026-08-14T10:30:00Z'
 );

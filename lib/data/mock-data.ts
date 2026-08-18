@@ -8,13 +8,13 @@ export const SAMPLE_LISTING_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
 
 export const mockListing: Listing = {
   id: SAMPLE_LISTING_ID,
-  title: 'Godown Unit A3 — Industrial Area',
-  location: 'Off Mombasa Road, Industrial Area, Nairobi',
+  title: 'ONLYYOU ELGEYO 2',
+  location: 'Elgeyo Marakwet Road, Nairobi',
   size_sqft: 10200,
   rent_ksh_per_sqft: 35,
   service_charge_ksh_per_sqft: 8,
   tier: 'live',
-  realsee_work_id: 'nmRVg9JX4Cl62XiXmP',
+  realsee_work_id: 'LmryyELeYI4B80i5DZ',
   created_at: new Date().toISOString(),
 }
 

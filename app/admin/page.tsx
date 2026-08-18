@@ -46,8 +46,8 @@ export default function AdminPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Custom VR ID binder
-  const [customVrId, setCustomVrId] = useState('nmRVg9JX4Cl62XiXmP')
-  const [customListingTitle, setCustomListingTitle] = useState('Live Industrial Godown')
+  const [customVrId, setCustomVrId] = useState('LmryyELeYI4B80i5DZ')
+  const [customListingTitle, setCustomListingTitle] = useState('ONLYYOU ELGEYO 2')
 
   useEffect(() => {
     getAllListings().then(setListings)
@@ -485,20 +485,27 @@ export default function AdminPage() {
                 </Link>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>
+              <div style={{ display: 'flex', gap: '8px', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                 <span>PRESET SPACES:</span>
+                <button
+                  onClick={() => setCustomVrId('LmryyELeYI4B80i5DZ')}
+                  style={{ background: 'none', border: 'none', color: 'var(--accent-emerald)', cursor: 'pointer', textDecoration: 'underline', fontWeight: 700 }}
+                >
+                  ONLYYOU ELGEYO 2 (Active Live 3D)
+                </button>
+                <span>•</span>
                 <button
                   onClick={() => setCustomVrId('nmRVg9JX4Cl62XiXmP')}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-orange)', cursor: 'pointer', textDecoration: 'underline' }}
                 >
-                  Deluxe Lounge (Galois LiDAR)
+                  Deluxe Lounge (LiDAR)
                 </button>
                 <span>•</span>
                 <button
                   onClick={() => setCustomVrId('BD0ggLIAlcjVaVf1oN')}
                   style={{ background: 'none', border: 'none', color: 'var(--accent-cyan)', cursor: 'pointer', textDecoration: 'underline' }}
                 >
-                  Elgeyo Space (Pano-to-3D)
+                  Elgeyo Pano Demo
                 </button>
               </div>
             </div>

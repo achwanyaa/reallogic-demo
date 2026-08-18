@@ -52,7 +52,7 @@ export default async function ListingPage({ params }: ListingPageProps) {
     )
   }
 
-  const workId = listing.realsee_work_id || 'nmRVg9JX4Cl62XiXmP'
+  const workId = listing.realsee_work_id || 'LmryyELeYI4B80i5DZ'
 
   const specs = [
     { label: 'TOTAL USABLE AREA', value: `${(listing.size_sqft || 10200).toLocaleString()} SQFT (947.6 M²)`, category: 'DIMENSIONS' },

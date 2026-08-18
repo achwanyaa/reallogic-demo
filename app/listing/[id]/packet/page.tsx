@@ -24,7 +24,7 @@ export default async function PacketPage({ params }: PacketPageProps) {
   const { id } = await params
   const listing = await getListing(id)
   const verification = await getCaptureVerification(id)
-  const workId = listing?.realsee_work_id || 'nmRVg9JX4Cl62XiXmP'
+  const workId = listing?.realsee_work_id || 'LmryyELeYI4B80i5DZ'
 
   const sections = [
     {

@@ -5,14 +5,19 @@
 -- ─── Sample Listing ─────────────────────────────────────────────────
 insert into listings (id, title, location, size_sqft, rent_ksh_per_sqft, service_charge_ksh_per_sqft, tier, realsee_work_id) values (
   'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  'Godown Unit A3 — Industrial Area',
-  'Off Mombasa Road, Industrial Area, Nairobi',
+  'ONLYYOU ELGEYO 2',
+  'Elgeyo Marakwet Road, Nairobi',
   10200,
   35,
   8,
   'live',
-  'nmRVg9JX4Cl62XiXmP'
-);
+  'LmryyELeYI4B80i5DZ'
+)
+on conflict (id) do update set
+  title = excluded.title,
+  location = excluded.location,
+  tier = excluded.tier,
+  realsee_work_id = excluded.realsee_work_id;
 
 -- ─── Hotspots ───────────────────────────────────────────────────────
 -- Floor Slab hotspot

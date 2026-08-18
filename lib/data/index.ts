@@ -8,9 +8,15 @@ import {
   mockHotspots,
   mockEquipmentModels,
   mockCaptureVerification,
+  mockVantagePoints,
   SAMPLE_LISTING_ID,
 } from './mock-data'
-import type { Listing, Hotspot, EquipmentModel, CaptureVerification } from '../realsee/types'
+import type { Listing, Hotspot, EquipmentModel, CaptureVerification, VantagePoint } from '../realsee/types'
+
+export async function getVantagePoints(listingId?: string): Promise<VantagePoint[]> {
+  return mockVantagePoints
+}
+
 
 export async function getListing(id: string): Promise<Listing | null> {
   if (isSupabaseConfigured()) {

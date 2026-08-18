@@ -62,7 +62,7 @@ export function DossierTourPreview({ listingId, hotspots = [] }: DossierTourPrev
 
       <div style={{ flex: 1, position: 'relative', background: '#000000' }}>
         <ThreeSpatialTourViewer
-          panoramaUrl="/mock/pano-warehouse-main.jpg"
+          panoramaUrl="/mock/alhusnain/IMG_20260523_100706_00_091.jpg"
           hotspots={hotspots}
           activeHotspot={null}
           onSelectHotspot={() => {}}

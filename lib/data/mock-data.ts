@@ -107,3 +107,65 @@ export const mockCaptureVerification: CaptureVerification = {
   captured_at: '2026-08-14T10:30:00Z',
   created_at: new Date().toISOString(),
 }
+
+import type { VantagePoint } from '../realsee/types'
+
+export const mockVantagePoints: VantagePoint[] = [
+  {
+    id: 'node-01',
+    name: '01. Main Entrance & Showroom Bay',
+    panoUrl: '/mock/alhusnain/IMG_20260523_100706_00_091.jpg',
+    category: 'ground',
+    positionIndex: 1,
+  },
+  {
+    id: 'node-02',
+    name: '02. Primary Floor Span & Corridor',
+    panoUrl: '/mock/alhusnain/IMG_20260523_100808_00_094.jpg',
+    category: 'ground',
+    positionIndex: 2,
+  },
+  {
+    id: 'node-03',
+    name: '03. Central Display & Inspection Area',
+    panoUrl: '/mock/alhusnain/IMG_20260523_101038_00_100.jpg',
+    category: 'ground',
+    positionIndex: 3,
+  },
+  {
+    id: 'node-04',
+    name: '04. Service & Workshop Bay',
+    panoUrl: '/mock/alhusnain/IMG_20260523_101524_00_106.jpg',
+    category: 'ground',
+    positionIndex: 4,
+  },
+  {
+    id: 'node-05',
+    name: '05. Logistics & Motorized Roller Shutter',
+    panoUrl: '/mock/alhusnain/IMG_20260523_102001_00_118.jpg',
+    category: 'ground',
+    positionIndex: 5,
+  },
+  {
+    id: 'node-06',
+    name: '06. Parts Racking & Storage Grid',
+    panoUrl: '/mock/alhusnain/IMG_20260523_102607_00_128.jpg',
+    category: 'ground',
+    positionIndex: 6,
+  },
+  {
+    id: 'node-07',
+    name: '07. Rear Staging & Detailing Bay',
+    panoUrl: '/mock/alhusnain/IMG_20260523_103202_00_139.jpg',
+    category: 'ground',
+    positionIndex: 7,
+  },
+  {
+    id: 'node-08',
+    name: '08. Structural Perimeter & Power MDB',
+    panoUrl: '/mock/alhusnain/IMG_20260523_104214_00_160.jpg',
+    category: 'ground',
+    positionIndex: 8,
+  },
+]
+

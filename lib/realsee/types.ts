@@ -121,3 +121,13 @@ export const TIER_CONFIG: Record<TierLevel, TierConfig> = {
     color: 'slate',
   },
 }
+
+// ─── Vantage Point Scan Nodes ──────────────────────────────────────
+export interface VantagePoint {
+  id: string
+  name: string
+  panoUrl: string
+  category: 'ground' | 'mezzanine' | 'truss' | 'exterior'
+  positionIndex: number
+}
+

@@ -18,8 +18,8 @@ import {
 import { HotspotMarker } from '@/components/tour/HotspotMarker'
 import { HotspotInfoCard } from '@/components/tour/HotspotInfoCard'
 import { TierBadge } from '@/components/ui/TierBadge'
-import { getListing, getHotspots } from '@/lib/data'
-import type { Listing, Hotspot } from '@/lib/realsee/types'
+import { getListing, getHotspots, getVantagePoints } from '@/lib/data'
+import type { Listing, Hotspot, VantagePoint } from '@/lib/realsee/types'
 
 // Dynamic import for WebGL Three.js Spatial Tour Viewer (SSR-safe)
 const ThreeSpatialTourViewer = dynamic(
@@ -55,14 +55,22 @@ export default function TourPage() {
   const [viewMode, setViewMode] = useState<'3d-tour' | 'hotspots'>('3d-tour')
   const [activeFloorLayer, setActiveFloorLayer] = useState<'ground' | 'mezzanine' | 'truss'>('ground')
   const [measurementActive, setMeasurementActive] = useState(false)
+  const [vantagePoints, setVantagePoints] = useState<VantagePoint[]>([])
+  const [activeVantage, setActiveVantage] = useState<VantagePoint | null>(null)
 
   useEffect(() => {
     getListing(id).then(setListing)
     getHotspots(id).then(setHotspots)
+    getVantagePoints(id).then((points) => {
+      setVantagePoints(points)
+      if (points.length > 0) {
+        setActiveVantage(points[0])
+      }
+    })
   }, [id])
 
   const workId = listing?.realsee_work_id || '80P29aOvr7kw98eDxE'
-  const panoramaUrl = '/mock/pano-warehouse-main.jpg'
+  const panoramaUrl = activeVantage?.panoUrl || '/mock/alhusnain/IMG_20260523_100706_00_091.jpg'
 
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
@@ -253,6 +261,9 @@ export default function TourPage() {
           activeHotspot={activeHotspot}
           onSelectHotspot={setActiveHotspot}
           activeFloorLayer={activeFloorLayer}
+          vantagePoints={vantagePoints}
+          activeVantageId={activeVantage?.id}
+          onSelectVantage={setActiveVantage}
         />
 
         {/* Measurement Reticle Overlay (if enabled) */}

@@ -1,11 +1,11 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
-import type { Hotspot } from '@/lib/realsee/types'
-import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import type { Hotspot, VantagePoint } from '@/lib/realsee/types'
+import { ZoomIn, ZoomOut, RotateCcw, ChevronLeft, ChevronRight, MapPin, Layers } from 'lucide-react'
 
 interface ThreeSpatialTourViewerProps {
   panoramaUrl: string
@@ -13,6 +13,9 @@ interface ThreeSpatialTourViewerProps {
   activeHotspot: Hotspot | null
   onSelectHotspot: (hotspot: Hotspot | null) => void
   activeFloorLayer?: 'ground' | 'mezzanine' | 'truss'
+  vantagePoints?: VantagePoint[]
+  activeVantageId?: string
+  onSelectVantage?: (vantage: VantagePoint) => void
 }
 
 // 360° Inverted Sphere rendering the equirectangular panorama texture
@@ -83,6 +86,9 @@ export function ThreeSpatialTourViewer({
   hotspots,
   activeHotspot,
   onSelectHotspot,
+  vantagePoints = [],
+  activeVantageId,
+  onSelectVantage,
 }: ThreeSpatialTourViewerProps) {
   const [fov, setFov] = useState(75)
   const [heading, setHeading] = useState(0)
@@ -95,6 +101,23 @@ export function ThreeSpatialTourViewer({
       controlsRef.current.reset()
     }
     setFov(75)
+  }
+
+  // Handle sequential step walking between scan nodes
+  const currentIndex = vantagePoints.findIndex((v) => v.id === activeVantageId || v.panoUrl === panoramaUrl)
+  const hasPrev = currentIndex > 0
+  const hasNext = currentIndex < vantagePoints.length - 1
+
+  const handleStepPrev = () => {
+    if (hasPrev && onSelectVantage) {
+      onSelectVantage(vantagePoints[currentIndex - 1])
+    }
+  }
+
+  const handleStepNext = () => {
+    if (hasNext && onSelectVantage) {
+      onSelectVantage(vantagePoints[currentIndex + 1])
+    }
   }
 
   return (
@@ -131,6 +154,92 @@ export function ThreeSpatialTourViewer({
           }}
         />
       </Canvas>
+
+      {/* ─── Top Floating Multi-Node Scan Location Navigator ─────────── */}
+      {vantagePoints.length > 1 && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(9, 11, 14, 0.9)',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-xs)',
+            border: '1px solid var(--border-medium)',
+            backdropFilter: 'blur(12px)',
+            maxWidth: '90%',
+            overflowX: 'auto',
+            zIndex: 35,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+          }}
+        >
+          <button
+            onClick={handleStepPrev}
+            disabled={!hasPrev}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'transparent',
+              border: 'none',
+              color: hasPrev ? '#FFFFFF' : 'var(--text-muted)',
+              cursor: hasPrev ? 'pointer' : 'default',
+              padding: '2px 4px',
+            }}
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+            {vantagePoints.map((v, idx) => {
+              const isSelected = v.id === activeVantageId || v.panoUrl === panoramaUrl
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => onSelectVantage && onSelectVantage(v)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-xs)',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.72rem',
+                    fontWeight: isSelected ? 700 : 500,
+                    border: isSelected ? '1px solid var(--accent-orange)' : '1px solid var(--border-subtle)',
+                    background: isSelected ? 'rgba(249, 115, 22, 0.18)' : 'var(--bg-secondary)',
+                    color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    transition: 'all 120ms ease',
+                  }}
+                >
+                  <MapPin size={11} color={isSelected ? 'var(--accent-orange)' : 'var(--text-muted)'} />
+                  <span>{v.name}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <button
+            onClick={handleStepNext}
+            disabled={!hasNext}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'transparent',
+              border: 'none',
+              color: hasNext ? '#FFFFFF' : 'var(--text-muted)',
+              cursor: hasNext ? 'pointer' : 'default',
+              padding: '2px 4px',
+            }}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      )}
 
       {/* ─── Bottom-Right On-Screen Viewport Controls ───────────────── */}
       <div
@@ -225,6 +334,12 @@ export function ThreeSpatialTourViewer({
         <span>REALLOGIC SPATIAL ENGINE</span>
         <span style={{ color: 'var(--border-strong)' }}>|</span>
         <span style={{ color: '#FFFFFF' }}>AZIMUTH: {heading.toString().padStart(3, '0')}°</span>
+        {vantagePoints.length > 0 && (
+          <>
+            <span style={{ color: 'var(--border-strong)' }}>|</span>
+            <span style={{ color: 'var(--accent-orange)' }}>NODE {currentIndex + 1}/{vantagePoints.length}</span>
+          </>
+        )}
       </div>
     </div>
   )

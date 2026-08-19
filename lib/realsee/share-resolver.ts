@@ -1,12 +1,11 @@
 /**
- * Resolves a Realsee work object from a share link or short code (e.g. "7kyyNwq8" or "80P29aOvr7kw98eDxE")
- * by extracting and resolving the SSR flight payload directly from Realsee.
+ * Resolves a Realsee spatial work object from a share link or short code (e.g. "7kyyNwq8")
+ * by extracting and resolving the complete SSR flight payload directly from Realsee.
  */
 export async function fetchWorkFromShareLink(codeOrUrl: string): Promise<any | null> {
   try {
     let url = codeOrUrl
     if (!url.startsWith('http')) {
-      // If it's a short code or tour ID
       url = codeOrUrl.startsWith('80')
         ? `https://realsee.ai/tour/${codeOrUrl}`
         : `https://realsee.ai/${codeOrUrl}`
@@ -14,7 +13,7 @@ export async function fetchWorkFromShareLink(codeOrUrl: string): Promise<any | n
 
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       },
       next: { revalidate: 3600 },
     })
@@ -24,7 +23,7 @@ export async function fetchWorkFromShareLink(codeOrUrl: string): Promise<any | n
 
     // Extract all flight push chunks
     const regex = /self\.__next_f\.push\(\[1,\s*"([\s\S]*?)"\]\)/g
-    let match
+    let match: RegExpExecArray | null
     let flightPayload = ''
 
     while ((match = regex.exec(html)) !== null) {
@@ -38,24 +37,56 @@ export async function fetchWorkFromShareLink(codeOrUrl: string): Promise<any | n
 
     if (!flightPayload) return null
 
-    // Parse RSC entries
-    const lines = flightPayload.split('\n')
+    // Parse RSC chunks handling typed lengths (e.g. T<hex_len>,)
     const entries: Record<string, string> = {}
-    for (const line of lines) {
-      const colonIdx = line.indexOf(':')
-      if (colonIdx > 0 && colonIdx < 10) {
-        const id = line.substring(0, colonIdx)
-        const content = line.substring(colonIdx + 1)
-        entries[id] = content
+    let pos = 0
+    const str = flightPayload
+
+    while (pos < str.length) {
+      const colon = str.indexOf(':', pos)
+      if (colon === -1) break
+
+      const id = str.substring(pos, colon).trim()
+      if (!id || id.includes(' ') || id.length > 8) {
+        const nl = str.indexOf('\n', pos)
+        if (nl === -1) break
+        pos = nl + 1
+        continue
+      }
+
+      pos = colon + 1
+      if (str[pos] === 'T' || str[pos] === 'I' || str[pos] === 'M' || str[pos] === 'H') {
+        const comma = str.indexOf(',', pos)
+        if (comma !== -1 && comma - pos < 10) {
+          const lenHex = str.substring(pos + 1, comma)
+          const len = parseInt(lenHex, 16)
+          if (!isNaN(len)) {
+            const contentStart = comma + 1
+            const content = str.substr(contentStart, len)
+            entries[id] = content
+            pos = contentStart + len
+            if (str[pos] === '\n') pos++
+            continue
+          }
+        }
+      }
+
+      const nl = str.indexOf('\n', pos)
+      if (nl === -1) {
+        entries[id] = str.substring(pos)
+        break
+      } else {
+        entries[id] = str.substring(pos, nl)
+        pos = nl + 1
       }
     }
 
     function resolveValue(val: any, depth = 0): any {
-      if (depth > 25) return val
+      if (depth > 30) return val
       if (typeof val === 'string' && val.startsWith('$')) {
         const refId = val.substring(1)
         if (refId === 'undefined') return undefined
-        if (entries[refId]) {
+        if (entries[refId] !== undefined) {
           try {
             const parsed = JSON.parse(entries[refId])
             return resolveObject(parsed, depth + 1)
@@ -80,8 +111,8 @@ export async function fetchWorkFromShareLink(codeOrUrl: string): Promise<any | n
     }
 
     // Find entry with base_url and observers (the work definition)
-    for (const [k, v] of Object.entries(entries)) {
-      if (v.includes('base_url') && (v.includes('observers') || v.includes('panorama'))) {
+    for (const [, v] of Object.entries(entries)) {
+      if (v.includes('base_url') && (v.includes('observers') || v.includes('panorama') || v.includes('model'))) {
         try {
           const parsed = JSON.parse(v)
           if (parsed && typeof parsed === 'object' && parsed.base_url) {

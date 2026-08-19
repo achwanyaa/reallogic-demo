@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Eye, Grid3x3, Layers, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Eye, Grid3x3, Layers, Compass, ChevronLeft, ChevronRight, Maximize2, RotateCcw } from 'lucide-react'
 import type { Hotspot } from '@/lib/realsee/types'
 
-type ViewMode = 'Panorama' | 'Dollhouse' | 'Floorplan'
+type ViewMode = 'Panorama' | 'Model' | 'Floorplan' | 'Topview'
 
 // Local AlHusnain fallback panoramas (used when work data is unavailable)
 const LOCAL_PANOS = [
@@ -23,7 +23,7 @@ interface RealseeSpaceTourViewerProps {
   hotspots?: Hotspot[]
 }
 
-// Dynamically load Five only client-side (it requires browser WebGL)
+// Dynamically load Five only client-side (requires browser WebGL)
 async function loadFive() {
   const { Five } = await import('@realsee/five')
   return Five
@@ -43,7 +43,6 @@ async function fetchWorkData(workId: string) {
   }
   return res.json()
 }
-
 
 export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTourViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -66,44 +65,52 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
       try {
         setLoading(true)
         setError(null)
+        setFallbackMode(false)
 
-        // Step 1: load Five class
+        // Step 1: Load Five engine
         const Five = await loadFive()
-
         if (!mounted) return
 
-        // Step 2: fetch work data through our server-side proxy
+        // Step 2: Fetch spatial work data through our server proxy
         const workData = await fetchWorkData(workId)
-
         if (!mounted) return
 
-        // Extract useful metadata for the HUD
         const panos = workData?.observers || workData?.panoramas || workData?.panos || []
         const title = workData?.title || workData?.name
         setWorkMeta({ title, panoCount: Array.isArray(panos) ? panos.length : undefined })
 
-        // Step 3: instantiate Five and attach to DOM container
+        // Step 3: Instantiate Five engine
         five = new Five({
+          backgroundColor: 0x050709,
+          antialias: true,
+          poweredByRealsee: false,
           imageOptions: { size: 1024, quality: 85 },
         })
         fiveRef.current = five
 
         if (containerRef.current) {
           five.appendTo(containerRef.current)
+          five.refresh()
         }
 
-        // Step 4: load the spatial work data
-        await five.load(workData)
+        // Listen for mode changes triggered by clicks or gestures
+        five.on('stateChange', (state: any) => {
+          if (state?.mode && ['Panorama', 'Model', 'Floorplan', 'Topview'].includes(state.mode)) {
+            setViewMode(state.mode as ViewMode)
+          }
+        })
 
+        // Step 4: Load the 3D twin dataset (observers + mesh model + floor plan)
+        await five.load(workData)
         if (!mounted) return
 
-        // Step 5: start with panorama walkthrough mode
+        // Step 5: Initial mode (default to Panorama walkthrough)
         five.setState({ mode: 'Panorama' })
+        five.refresh()
         setLoading(false)
       } catch (err: any) {
         if (!mounted) return
         console.error('[RealseeSpaceTourViewer] Init error:', err)
-        // Fall back to local panoramas so the viewer is still useful
         setFallbackMode(true)
         setError(err?.message || 'Work data unavailable')
         setWorkMeta({ panoCount: LOCAL_PANOS.length })
@@ -113,8 +120,16 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
 
     init()
 
+    const handleResize = () => {
+      if (fiveRef.current) {
+        fiveRef.current.refresh?.()
+      }
+    }
+    window.addEventListener('resize', handleResize)
+
     return () => {
       mounted = false
+      window.removeEventListener('resize', handleResize)
       if (fiveRef.current) {
         try {
           fiveRef.current.dispose?.()
@@ -124,19 +139,20 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
     }
   }, [workId])
 
-
   const switchMode = (mode: ViewMode) => {
     setViewMode(mode)
     if (fiveRef.current) {
       try {
         fiveRef.current.setState({ mode }, true, false)
-      } catch (_) {}
+      } catch (e) {
+        console.warn('[Five] mode switch warning:', e)
+      }
     }
   }
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', background: '#050709', overflow: 'hidden' }}>
-      {/* ─── Five WebGL Container ─── */}
+      {/* ─── Five WebGL 3D Canvas Container ─── */}
       <div
         ref={containerRef}
         style={{
@@ -160,6 +176,7 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             background: '#050709',
             gap: '16px',
             fontFamily: 'var(--font-mono)',
+            zIndex: 50,
           }}
         >
           <div style={{ position: 'relative', width: '48px', height: '48px' }}>
@@ -174,10 +191,10 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
           </div>
           <div>
             <p style={{ color: 'var(--accent-orange)', fontSize: '0.82rem', marginBottom: '4px' }}>
-              LOADING SPATIAL DIGITAL TWIN...
+              INITIALIZING 3D SPATIAL TWIN...
             </p>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', textAlign: 'center' }}>
-              Fetching 3D model • Pano meshes • Floor plan
+              Loading 3D mesh model • 58 Pano nodes • Floor plan
             </p>
           </div>
         </div>
@@ -185,8 +202,7 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
 
       {/* ─── Fallback: Local Panorama Browser ─── */}
       {!loading && fallbackMode && (
-        <div style={{ position: 'absolute', inset: 0, background: '#000' }}>
-          {/* Full-screen equirectangular panorama */}
+        <div style={{ position: 'absolute', inset: 0, background: '#000', zIndex: 10 }}>
           <img
             src={LOCAL_PANOS[fallbackIdx]}
             alt={`Scan node ${fallbackIdx + 1}`}
@@ -261,64 +277,13 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             zIndex: 20,
             backdropFilter: 'blur(8px)',
           }}>
-            NODE {fallbackIdx + 1} / {LOCAL_PANOS.length}
-          </div>
-
-          {/* Node strip */}
-          <div style={{
-            position: 'absolute',
-            bottom: '52px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            gap: '6px',
-            background: 'rgba(9,11,14,0.85)',
-            padding: '6px 10px',
-            borderRadius: 'var(--radius-xs)',
-            border: '1px solid var(--border-subtle)',
-            backdropFilter: 'blur(8px)',
-            zIndex: 20,
-          }}>
-            {LOCAL_PANOS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setFallbackIdx(i)}
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  border: 'none',
-                  background: i === fallbackIdx ? 'var(--accent-orange)' : 'var(--border-strong)',
-                  cursor: 'pointer',
-                  padding: 0,
-                  transition: 'background 120ms ease',
-                  boxShadow: i === fallbackIdx ? '0 0 6px var(--accent-orange)' : 'none',
-                }}
-              />
-            ))}
-          </div>
-
-          {/* "Demo mode" notice */}
-          <div style={{
-            position: 'absolute',
-            bottom: '16px',
-            left: '16px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.66rem',
-            color: 'rgba(249,115,22,0.7)',
-            background: 'rgba(9,11,14,0.82)',
-            padding: '4px 10px',
-            borderRadius: 'var(--radius-xs)',
-            border: '1px solid rgba(249,115,22,0.3)',
-            zIndex: 20,
-          }}>
-            ⚠ DEMO MODE — Add your Realsee work ID to enable full spatial twin
+            LOCAL SCAN {fallbackIdx + 1} / {LOCAL_PANOS.length}
           </div>
         </div>
       )}
 
-      {/* ─── Top View Mode Switcher ─── */}
-      {!loading && !error && (
+      {/* ─── Top 3D View Mode Switcher (Walk / 3D Dollhouse Model / Floor Plan) ─── */}
+      {!loading && !fallbackMode && (
         <div
           style={{
             position: 'absolute',
@@ -328,7 +293,7 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            background: 'rgba(9, 11, 14, 0.92)',
+            background: 'rgba(9, 11, 14, 0.94)',
             padding: '5px',
             borderRadius: 'var(--radius-xs)',
             border: '1px solid var(--border-medium)',
@@ -339,8 +304,9 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
         >
           {([
             { mode: 'Panorama', icon: <Eye size={13} />, label: 'WALK' },
-            { mode: 'Dollhouse', icon: <Grid3x3 size={13} />, label: 'DOLLHOUSE' },
+            { mode: 'Model', icon: <Grid3x3 size={13} />, label: '3D DOLLHOUSE' },
             { mode: 'Floorplan', icon: <Layers size={13} />, label: 'FLOOR PLAN' },
+            { mode: 'Topview', icon: <Compass size={13} />, label: 'TOP VIEW' },
           ] as const).map(({ mode, icon, label }) => (
             <button
               key={mode}
@@ -349,30 +315,27 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '5px 12px',
+                padding: '6px 12px',
                 borderRadius: 'calc(var(--radius-xs) - 1px)',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.7rem',
+                fontSize: '0.72rem',
                 fontWeight: viewMode === mode ? 700 : 500,
                 border: 'none',
-                background: viewMode === mode ? 'rgba(249, 115, 22, 0.22)' : 'transparent',
-                color: viewMode === mode ? '#FFFFFF' : 'var(--text-secondary)',
+                background: viewMode === mode ? 'var(--accent-orange)' : 'transparent',
+                color: viewMode === mode ? '#000000' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 transition: 'all 120ms ease',
-                outline: viewMode === mode ? '1px solid rgba(249, 115, 22, 0.5)' : 'none',
               }}
             >
-              <span style={{ color: viewMode === mode ? 'var(--accent-orange)' : 'var(--text-muted)' }}>
-                {icon}
-              </span>
+              <span>{icon}</span>
               <span>{label}</span>
             </button>
           ))}
         </div>
       )}
 
-      {/* ─── Bottom-Left Live Watermark ─── */}
-      {!loading && !error && (
+      {/* ─── Bottom-Left Live Watermark & Status ─── */}
+      {!loading && !fallbackMode && (
         <div
           style={{
             position: 'absolute',
@@ -381,8 +344,8 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(9, 11, 14, 0.88)',
-            padding: '5px 12px',
+            background: 'rgba(9, 11, 14, 0.9)',
+            padding: '6px 14px',
             borderRadius: 'var(--radius-xs)',
             border: '1px solid var(--border-subtle)',
             fontFamily: 'var(--font-mono)',
@@ -400,7 +363,7 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             background: 'var(--accent-emerald)',
             boxShadow: '0 0 6px var(--accent-emerald)',
           }} />
-          <span>REALLOGIC SPATIAL ENGINE</span>
+          <span style={{ color: '#FFFFFF', fontWeight: 700 }}>REALLOGIC SPATIAL ENGINE</span>
           {workMeta?.panoCount !== undefined && (
             <>
               <span style={{ color: 'var(--border-strong)' }}>|</span>
@@ -408,19 +371,19 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             </>
           )}
           <span style={{ color: 'var(--border-strong)' }}>|</span>
-          <span style={{ color: '#FFFFFF' }}>{viewMode.toUpperCase()} MODE</span>
+          <span style={{ color: '#34D399' }}>{viewMode.toUpperCase()} ACTIVE</span>
         </div>
       )}
 
-      {/* ─── Walk Mode Instruction Hint ─── */}
-      {!loading && !error && viewMode === 'Panorama' && (
+      {/* ─── Mode Helper Instructions ─── */}
+      {!loading && !fallbackMode && (
         <div
           style={{
             position: 'absolute',
             bottom: '16px',
             right: '16px',
-            background: 'rgba(9, 11, 14, 0.82)',
-            padding: '5px 10px',
+            background: 'rgba(9, 11, 14, 0.85)',
+            padding: '5px 12px',
             borderRadius: 'var(--radius-xs)',
             border: '1px solid var(--border-subtle)',
             fontFamily: 'var(--font-mono)',
@@ -430,7 +393,10 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             zIndex: 30,
           }}
         >
-          CLICK FLOOR TARGETS TO WALK · DRAG TO LOOK · SCROLL TO ZOOM
+          {viewMode === 'Panorama' && 'CLICK FLOOR TARGETS TO WALK · DRAG TO LOOK · SCROLL TO ZOOM'}
+          {viewMode === 'Model' && 'DRAG TO ROTATE 3D DOLLHOUSE · SCROLL TO ZOOM · CLICK ROOM TO ENTER'}
+          {viewMode === 'Floorplan' && 'TOP-DOWN 2D SCHEMATIC · CLICK ROOM TO JUMP TO SCAN'}
+          {viewMode === 'Topview' && 'ORTHOGRAPHIC 2D OVERVIEW · DRAG TO PAN'}
         </div>
       )}
 

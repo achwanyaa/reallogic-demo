@@ -50,7 +50,7 @@ export function DossierTourPreview({ listingId, workId = '7kyyNwq8', hotspots = 
       <div className="hud-panel-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Crosshair size={14} color="var(--accent-emerald)" />
-          <span>ACTIVE 3D DIGITAL TWIN • SPATIAL VIEWPORT</span>
+          <span>360° SAMPLE PROPERTY VIEW</span>
         </div>
         <Link
           href={`/listing/${listingId}/tour`}

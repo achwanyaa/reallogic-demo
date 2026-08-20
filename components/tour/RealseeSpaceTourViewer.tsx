@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Eye, Grid3x3, Layers, Compass, ChevronLeft, ChevronRight, Maximize2, RotateCcw } from 'lucide-react'
 import type { Hotspot } from '@/lib/realsee/types'
+import { PanoramaViewer } from './PanoramaViewer'
 
 type ViewMode = 'Panorama' | 'Model' | 'Floorplan' | 'Topview'
 
@@ -203,17 +204,7 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
       {/* ─── Fallback: Local Panorama Browser ─── */}
       {!loading && fallbackMode && (
         <div style={{ position: 'absolute', inset: 0, background: '#000', zIndex: 10 }}>
-          <img
-            src={LOCAL_PANOS[fallbackIdx]}
-            alt={`Scan node ${fallbackIdx + 1}`}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              objectPosition: 'center',
-              display: 'block',
-            }}
-          />
+          <PanoramaViewer imageUrl={LOCAL_PANOS[fallbackIdx]} />
 
           {/* Navigation arrows */}
           <button
@@ -277,7 +268,7 @@ export function RealseeSpaceTourViewer({ workId, hotspots = [] }: RealseeSpaceTo
             zIndex: 20,
             backdropFilter: 'blur(8px)',
           }}>
-            LOCAL SCAN {fallbackIdx + 1} / {LOCAL_PANOS.length}
+            360° SAMPLE VIEW {fallbackIdx + 1} / {LOCAL_PANOS.length}
           </div>
         </div>
       )}

@@ -108,7 +108,7 @@ export function Tier3PreviewCards({ listingId }: { listingId: string }) {
                   fontSize: '0.95rem',
                   letterSpacing: '0.02em',
                   marginBottom: '8px',
-                  color: '#FFFFFF',
+                  color: 'var(--text-primary)',
                 }}
               >
                 {feature.title}

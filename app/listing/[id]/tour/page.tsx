@@ -214,6 +214,23 @@ export default function TourPage() {
           hotspots={hotspots}
         />
 
+        {/* Hotspots are positioned from scene coordinates into the HUD viewport. */}
+        {hotspots.map((hotspot) => {
+          const x = Math.min(88, Math.max(12, 50 + hotspot.position.x * 4.5))
+          const y = Math.min(82, Math.max(18, 54 - hotspot.position.z * 4.5 - hotspot.position.y * 2))
+          return (
+            <HotspotMarker
+              key={hotspot.id}
+              category={hotspot.category}
+              label={hotspot.label}
+              x={x}
+              y={y}
+              isActive={activeHotspot?.id === hotspot.id}
+              onClick={() => setActiveHotspot(hotspot)}
+            />
+          )
+        })}
+
         {/* Measurement Reticle Overlay (if enabled) */}
         {measurementActive && (
           <div

@@ -1,4 +1,4 @@
-import { Terminal, Shield, Cpu, Activity } from 'lucide-react'
+import { Shield } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -20,7 +20,7 @@ export function Footer() {
         }}
       >
         <span className="status-pulse-amber" style={{ width: '5px', height: '5px' }} />
-        <span>[NOTICE] STRUCTURAL METRICS & EQUIPMENT DATA CONFIGURED FOR NAIROBI INDUSTRIAL CORRIDOR (SAMPLE SPECIFICATION)</span>
+          <span>This is a sample property and the measurements are for demonstration only.</span>
       </div>
 
       {/* Engineering Metadata Grid */}
@@ -39,31 +39,29 @@ export function Footer() {
       >
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#FFFFFF' }}>
-            <Cpu size={15} color="var(--accent-orange)" />
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>ENGINE CORE</span>
+              <span style={{ fontWeight: 700 }}>What this demo shows</span>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
-            High-Performance WebGL Spatial Mesh Engine & Photogrammetry Pipeline. Server-side token exchange with proxy isolation.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+              A property page with a 3D tour, measured site information, and equipment clearance checks.
           </p>
         </div>
 
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#FFFFFF' }}>
             <Shield size={15} color="var(--accent-emerald)" />
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>SURVEY ACCURACY</span>
+              <span style={{ fontWeight: 700 }}>Verification</span>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
-            ±15mm volumetric precision via LiDAR point clouds and calibrated 360° equirectangular photogrammetry.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+              The verification badge identifies which information is currently part of the demonstration.
           </p>
         </div>
 
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#FFFFFF' }}>
-            <Terminal size={15} color="var(--accent-cyan)" />
-            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>AEC COMPLIANCE</span>
+              <span style={{ fontWeight: 700 }}>Next step</span>
           </div>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
-            Structural slab tolerance (kN/m²), clear truss heights, 3-phase amperage, and turning radius telemetry.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', lineHeight: 1.6 }}>
+              Connect a real Realsee space and replace the sample values with verified project data.
           </p>
         </div>
       </div>
@@ -84,12 +82,11 @@ export function Footer() {
           color: 'var(--text-muted)',
         }}
       >
-        <div>
-          © {new Date().getFullYear()} REALLOGIC SPATIAL INTELLIGENCE PLATFORM • ALL RIGHTS RESERVED
-        </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <span>LOC: -1.3197° S, 36.8524° E</span>
-          <span style={{ color: 'var(--accent-emerald)' }}>[TELEMETRY: STABLE]</span>
+          <div>
+            © {new Date().getFullYear()} Reallogic
+          </div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <span>Industrial Area, Nairobi</span>
         </div>
       </div>
     </footer>

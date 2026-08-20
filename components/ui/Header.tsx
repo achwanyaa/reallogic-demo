@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Boxes, Compass, Eye, ShieldCheck, Terminal } from 'lucide-react'
+import { Boxes, Eye } from 'lucide-react'
 import { SAMPLE_LISTING_ID } from '@/lib/data/mock-data'
 
 export function Header() {
@@ -44,14 +44,8 @@ export function Header() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--accent-emerald)' }}>
-            <span className="status-pulse-emerald" />
-            SYSTEM: ONLINE
-          </span>
-          <span className="hidden sm:inline" style={{ color: 'var(--border-strong)' }}>|</span>
-          <span className="hidden sm:inline" style={{ color: 'var(--text-secondary)' }}>
-            SPATIAL ENGINE: ONLINE • ACCURACY: ±15mm
-          </span>
+            <span>Sample warehouse demonstration</span>
+            <span>Data shown for demonstration purposes</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span className="hidden md:inline">LATENCY: 14ms</span>
@@ -123,11 +117,11 @@ export function Header() {
                   fontWeight: 700,
                 }}
               >
-                CAD-v2
+                  DEMO
               </span>
             </div>
             <p style={{ fontSize: '0.65rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', lineHeight: 1 }}>
-              SPATIAL INTELLIGENCE
+                Property intelligence
             </p>
           </div>
         </Link>
@@ -142,7 +136,7 @@ export function Header() {
           }}
           className="hidden md:flex"
         >
-          {navLinks.map((link) => {
+            {navLinks.slice(0, 5).map((link) => {
             const isActive = pathname === link.href
             return (
               <Link
@@ -150,8 +144,8 @@ export function Header() {
                 href={link.href}
                 style={{
                   padding: '6px 12px',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.74rem',
+                    fontFamily: 'var(--font-ui)',
+                    fontSize: '0.84rem',
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? 'var(--accent-orange)' : 'var(--text-secondary)',
                   background: isActive ? 'rgba(249, 115, 22, 0.08)' : 'transparent',

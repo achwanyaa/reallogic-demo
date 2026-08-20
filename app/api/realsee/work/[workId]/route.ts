@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { realseeAdapter } from '@/lib/realsee/adapter'
+import { mockAdapter, realseeAdapter } from '@/lib/realsee/adapter'
 import { fetchWorkFromShareLink } from '@/lib/realsee/share-resolver'
 
 export async function GET(
@@ -13,6 +13,14 @@ export async function GET(
       return NextResponse.json(
         { error: 'workId is required' },
         { status: 400 }
+      )
+    }
+
+    // The public demo uses bundled panoramas and must not make a remote lookup.
+    if (realseeAdapter === mockAdapter) {
+      return NextResponse.json(
+        { error: 'Mock spatial work data uses bundled panoramas.', workId },
+        { status: 404 }
       )
     }
 

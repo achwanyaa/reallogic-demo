@@ -21,7 +21,7 @@ import type { EquipmentItem, EquipmentOption } from '@/components/clearance/Ware
 
 // Dynamic import to avoid SSR issues with Three.js
 const WarehouseScene = dynamic(
-  () => import('@/components/clearance/WarehouseScene').then((mod) => mod.WarehouseScene),
+  () => import('@/components/clearance/ThreeWarehouseScene').then((mod) => mod.ThreeWarehouseScene),
   {
     ssr: false,
     loading: () => (

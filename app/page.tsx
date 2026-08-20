@@ -165,7 +165,7 @@ export default function LandingPage() {
               fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
               lineHeight: 1.08,
               letterSpacing: '-0.03em',
-              color: '#FFFFFF',
+              color: 'var(--text-primary)',
               marginBottom: '20px',
             }}
           >
@@ -205,7 +205,7 @@ export default function LandingPage() {
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
             border: '1px solid var(--border-strong)',
-            background: 'linear-gradient(180deg, #090C10 0%, #0E131A 100%)',
+            background: '#eef4fb',
           }}
         >
           {/* Header Bar */}
@@ -355,7 +355,7 @@ export default function LandingPage() {
                     TELEMETRY VERIFIED
                   </span>
                 </div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '6px' }}>
+                <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
                   {current.metric}
                 </div>
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -383,7 +383,7 @@ export default function LandingPage() {
                 fontWeight: 800,
                 fontSize: '1.8rem',
                 letterSpacing: '-0.02em',
-                color: '#FFFFFF',
+                color: 'var(--text-primary)',
               }}
             >
               Three-Tier Engineering Capability Matrix
@@ -426,7 +426,7 @@ export default function LandingPage() {
                     fontFamily: 'var(--font-ui)',
                     fontWeight: 700,
                     fontSize: '1.1rem',
-                    color: '#FFFFFF',
+                    color: 'var(--text-primary)',
                     marginBottom: '10px',
                     letterSpacing: '-0.01em',
                   }}
@@ -490,7 +490,7 @@ export default function LandingPage() {
                 fontFamily: 'var(--font-ui)',
                 fontWeight: 800,
                 fontSize: '1.6rem',
-                color: '#FFFFFF',
+                color: 'var(--text-primary)',
               }}
             >
               Featured Warehouse Listings
@@ -530,7 +530,7 @@ export default function LandingPage() {
                     {listing.status}
                   </span>
                 </div>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
                   {listing.title}
                 </h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '16px' }}>
@@ -560,7 +560,7 @@ export default function LandingPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
                     <span className="mono-tag" style={{ color: 'var(--text-muted)' }}>USABLE AREA</span>
-                    <p className="mono-metric" style={{ fontSize: '1rem', fontWeight: 700, color: '#FFFFFF' }}>
+                    <p className="mono-metric" style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       {listing.sqft}
                     </p>
                   </div>

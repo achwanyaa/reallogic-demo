@@ -2,19 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Boxes, Eye } from 'lucide-react'
+import { Eye } from 'lucide-react'
 import { SAMPLE_LISTING_ID } from '@/lib/data/mock-data'
 
 export function Header() {
   const pathname = usePathname()
 
   const navLinks = [
-    { label: 'PLATFORM', href: '/' },
-    { label: 'DOSSIER', href: `/listing/${SAMPLE_LISTING_ID}` },
-    { label: '3D TOUR', href: `/listing/${SAMPLE_LISTING_ID}/tour` },
-    { label: 'CLEARANCE SIM', href: `/listing/${SAMPLE_LISTING_ID}/clearance` },
-    { label: 'TECH PACKET', href: `/listing/${SAMPLE_LISTING_ID}/packet` },
-    { label: 'ADMIN', href: '/admin' },
+    { label: 'Overview', href: '/' },
+    { label: 'Sample listing', href: `/listing/${SAMPLE_LISTING_ID}` },
+    { label: 'How it works', href: '/#how-it-works' },
   ]
 
   return (
@@ -23,34 +20,28 @@ export function Header() {
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        background: 'rgba(9, 11, 14, 0.92)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        background: 'rgba(251, 250, 246, 0.94)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border-medium)',
       }}
     >
-      {/* Top Telemetry Ticker Bar */}
+      {/* Quiet demo notice */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '4px 24px',
-          background: 'var(--bg-void)',
+          padding: '7px 24px',
+          background: 'var(--bg-secondary)',
           borderBottom: '1px solid var(--border-subtle)',
           fontSize: '0.68rem',
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--font-ui)',
           color: 'var(--text-muted)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span>Sample warehouse demonstration</span>
-            <span>Data shown for demonstration purposes</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span className="hidden md:inline">LATENCY: 14ms</span>
-          <span style={{ color: 'var(--accent-orange)' }}>CAD/SPATIAL READY</span>
-        </div>
+          <span style={{ color: 'var(--text-primary)' }}>LuxuryBoma360 demonstration</span>
+        <span className="hidden sm:inline">Sample property data · Reallogic Kenya</span>
       </div>
 
       {/* Main Navigation Bar */}
@@ -65,7 +56,7 @@ export function Header() {
           gap: '20px',
         }}
       >
-        {/* Brand Logo */}
+        {/* Brand */}
         <Link
           href="/"
           style={{
@@ -76,52 +67,35 @@ export function Header() {
             color: 'var(--text-primary)',
           }}
         >
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: 'var(--radius-xs)',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--accent-orange)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--accent-orange)',
-              boxShadow: '0 0 12px var(--accent-orange-glow)',
-            }}
-          >
-            <Boxes size={18} strokeWidth={2.2} />
-          </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span
                 style={{
-                  fontFamily: 'var(--font-ui)',
-                  fontWeight: 800,
-                  fontSize: '1.05rem',
-                  letterSpacing: '-0.02em',
-                  color: '#FFFFFF',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  fontSize: '1.3rem',
+                  color: 'var(--text-primary)',
                 }}
               >
                 REALLOGIC
               </span>
               <span
                 style={{
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--font-ui)',
                   fontSize: '0.62rem',
                   padding: '1px 5px',
                   borderRadius: 'var(--radius-xs)',
-                  background: 'rgba(249, 115, 22, 0.15)',
+                  background: 'var(--bg-secondary)',
                   color: 'var(--accent-orange)',
-                  border: '1px solid rgba(249, 115, 22, 0.4)',
+                  border: '1px solid var(--border-medium)',
                   fontWeight: 700,
                 }}
               >
-                  DEMO
+                  demo
               </span>
             </div>
-            <p style={{ fontSize: '0.65rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', lineHeight: 1 }}>
-                Property intelligence
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.2 }}>
+              Verification layer for property and capital
             </p>
           </div>
         </Link>
@@ -136,7 +110,7 @@ export function Header() {
           }}
           className="hidden md:flex"
         >
-            {navLinks.slice(0, 5).map((link) => {
+            {navLinks.map((link) => {
             const isActive = pathname === link.href
             return (
               <Link
@@ -144,13 +118,13 @@ export function Header() {
                 href={link.href}
                 style={{
                   padding: '6px 12px',
-                    fontFamily: 'var(--font-ui)',
-                    fontSize: '0.84rem',
+                  fontFamily: 'var(--font-ui)',
+                  fontSize: '0.86rem',
                   fontWeight: isActive ? 700 : 500,
                   color: isActive ? 'var(--accent-orange)' : 'var(--text-secondary)',
-                  background: isActive ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
-                  border: isActive ? '1px solid rgba(249, 115, 22, 0.3)' : '1px solid transparent',
-                  borderRadius: 'var(--radius-xs)',
+                  background: isActive ? 'var(--bg-secondary)' : 'transparent',
+                  border: isActive ? '1px solid var(--border-medium)' : '1px solid transparent',
+                  borderRadius: '999px',
                   textDecoration: 'none',
                   transition: 'all 120ms ease',
                   whiteSpace: 'nowrap',
@@ -170,7 +144,7 @@ export function Header() {
             style={{ padding: '7px 14px', fontSize: '0.75rem', gap: '6px' }}
           >
             <Eye size={14} />
-            <span className="hidden sm:inline">INSPECT SPACE</span>
+            <span className="hidden sm:inline">Explore the sample</span>
           </Link>
         </div>
       </nav>

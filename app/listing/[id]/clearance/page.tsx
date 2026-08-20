@@ -131,7 +131,7 @@ export default function ClearancePage() {
   }
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
+    <div className="route-shell" style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
       {/* Header */}
       <div
         style={{

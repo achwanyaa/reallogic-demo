@@ -63,7 +63,7 @@ export default function TourPage() {
   const workId = listing?.realsee_work_id || '7kyyNwq8'
 
   return (
-    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
+    <div className="route-shell" style={{ maxWidth: '1440px', margin: '0 auto', padding: '24px' }}>
       {/* ─── Top Telemetry Header ─────────────────────────────────── */}
       <div
         style={{
